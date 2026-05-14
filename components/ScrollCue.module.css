@@ -1,0 +1,36 @@
+.cue {
+  position: absolute;
+  bottom: clamp(28px, 4.5vh, 56px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  font-family: var(--font-caption);
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--nl-charcoal);
+  opacity: 0;
+  animation: fade-up 900ms 4000ms var(--ease-default) forwards;
+  text-decoration: none;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to   { opacity: 0.78; transform: translate(-50%, 0); }
+}
+
+.line {
+  width: 1px;
+  height: 32px;
+  background: currentColor;
+  opacity: 0.5;
+  transform-origin: top;
+  animation: cue-pulse 2200ms 4400ms ease-in-out infinite;
+}
+@keyframes cue-pulse {
+  0%, 100% { transform: scaleY(0.5); opacity: 0.3; }
+  50%      { transform: scaleY(1);   opacity: 0.7; }
+}

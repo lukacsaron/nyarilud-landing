@@ -1,0 +1,54 @@
+.stripes {
+  position: absolute;
+  inset: -2% -6%;
+  z-index: 0;
+  pointer-events: none;
+  --stripe-w: clamp(56px, 7.4vw, 108px);
+  background: repeating-linear-gradient(
+    90deg,
+    var(--nl-cream-100) 0 var(--stripe-w),
+    var(--nl-dusty-blue) var(--stripe-w) calc(var(--stripe-w) * 2)
+  );
+  transform: translate3d(var(--mx, 0), 0, 0) scaleX(1.02);
+  transition: transform 1200ms var(--ease-default);
+  animation: stripe-drift 90s linear infinite;
+}
+
+@keyframes stripe-drift {
+  from { background-position: 0 0; }
+  to   { background-position: calc(var(--stripe-w) * 2) 0; }
+}
+
+.stripes::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--nl-cream-200);
+  animation: stripe-uncover 1800ms var(--ease-default) forwards;
+  transform-origin: right center;
+}
+@keyframes stripe-uncover {
+  0%   { transform: scaleX(1); }
+  100% { transform: scaleX(0); }
+}
+
+.veil {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(82vw, 980px);
+  height: min(72vh, 720px);
+  background: radial-gradient(
+    closest-side at 50% 50%,
+    rgba(244, 236, 220, 0.96) 0%,
+    rgba(244, 236, 220, 0.92) 40%,
+    rgba(244, 236, 220, 0) 100%
+  );
+  z-index: 1;
+  pointer-events: none;
+  animation: veil-in 1400ms 200ms var(--ease-default) both;
+}
+@keyframes veil-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

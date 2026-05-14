@@ -1,0 +1,45 @@
+.hero {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(48px, 6vw, 96px) clamp(20px, 4vw, 48px) clamp(120px, 12vh, 160px);
+}
+
+.stage {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: min(720px, 92vw);
+}
+
+.poem {
+  font-family: var(--font-body);
+  font-style: normal;
+  font-weight: 400;
+  font-size: clamp(17px, 1.5vw, 21px);
+  line-height: 1.5;
+  max-width: 38ch;
+  margin: clamp(20px, 3vw, 40px) auto 0;
+  color: var(--nl-charcoal-soft);
+  opacity: 0;
+  animation: fade-up 900ms 3300ms var(--ease-default) forwards;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-height: 720px) {
+  .poem { display: none; }
+}
+@media (max-width: 480px) {
+  .poem { font-size: 16px; max-width: 32ch; }
+}

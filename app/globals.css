@@ -1,0 +1,154 @@
+/* ============================================================
+   nyári lúd — design tokens + base
+   ============================================================ */
+
+:root {
+  /* Palette — boutique interior */
+  --nl-chocolate:    #6B4A35;
+  --nl-wine:         #7A2E2C;
+  --nl-cream:        #F4ECDC;
+  --nl-charcoal:     #1F1B17;
+  --nl-blush:        #D9B8AE;
+  --nl-butter:       #F2E2A7;
+  --nl-sage:         #A39B7E;
+  --nl-dusty-blue:   #A8B5B8;
+
+  /* Tints */
+  --nl-cream-100:    #FBF6EB;
+  --nl-cream-200:    #F4ECDC;
+  --nl-cream-300:    #ECE1CB;
+  --nl-blush-100:    #ECDAD2;
+  --nl-blush-200:    #D9B8AE;
+  --nl-blush-300:    #BE9588;
+  --nl-wine-100:     #9A4644;
+  --nl-wine-200:    #7A2E2C;
+  --nl-wine-300:     #561E1C;
+  --nl-charcoal-soft:#3A332C;
+  --nl-sage-soft:    #C2BCA3;
+  --nl-graphite:     #2C2520;
+
+  /* Semantic */
+  --color-bg:           var(--nl-cream-200);
+  --color-bg-elev:      var(--nl-cream-100);
+  --color-bg-sunk:      var(--nl-cream-300);
+  --color-bg-inverse:   var(--nl-charcoal);
+
+  --color-ink:          var(--nl-charcoal);
+  --color-ink-soft:     var(--nl-charcoal-soft);
+  --color-ink-muted:    var(--nl-sage);
+  --color-ink-inverse:  var(--nl-cream-100);
+
+  --color-accent:       var(--nl-wine);
+  --color-accent-hover: var(--nl-wine-300);
+  --color-accent-soft:  var(--nl-blush);
+
+  --color-border:        rgba(31, 27, 23, 0.14);
+  --color-border-strong: rgba(31, 27, 23, 0.32);
+  --color-rule:          rgba(31, 27, 23, 0.08);
+
+  /* Fonts — bound to next/font output via layout */
+  --font-display: var(--font-display-raw), "Hoefler Text", Didot, "Bodoni Moda", Garamond, serif;
+  --font-body:    var(--font-body-raw), -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --font-caption: var(--font-body-raw), -apple-system, sans-serif;
+
+  /* Scale */
+  --fs-100: 11px;
+  --fs-200: 13px;
+  --fs-300: 15px;
+  --fs-400: 17px;
+  --fs-500: 21px;
+  --fs-600: 28px;
+  --fs-700: 38px;
+  --fs-800: 56px;
+  --fs-900: 84px;
+  --fs-1000: 128px;
+
+  --lh-tight: 1.08;
+  --lh-snug:  1.20;
+  --lh-body:  1.55;
+  --lh-loose: 1.75;
+
+  --tracking-display: -0.012em;
+  --tracking-body:    0;
+  --tracking-caption: 0.18em;
+  --tracking-eyebrow: 0.32em;
+
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 24px; --sp-6: 32px; --sp-7: 48px;
+  --sp-8: 64px; --sp-9: 96px; --sp-10: 128px;
+
+  --radius-xs: 2px; --radius-sm: 4px; --radius-md: 8px; --radius-lg: 14px;
+  --radius-full: 999px;
+
+  --shadow-1: 0 1px 2px rgba(31,27,23,.06), 0 1px 1px rgba(31,27,23,.04);
+  --shadow-2: 0 4px 12px rgba(31,27,23,.08), 0 1px 2px rgba(31,27,23,.04);
+  --shadow-3: 0 10px 28px rgba(31,27,23,.12), 0 2px 6px rgba(31,27,23,.06);
+  --shadow-tag: 0 2px 0 rgba(31,27,23,.04), 0 6px 14px rgba(122,46,44,.10);
+
+  --ease-default: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-in:      cubic-bezier(0.4, 0, 1, 1);
+  --ease-out:     cubic-bezier(0, 0, 0.2, 1);
+  --dur-fast: 140ms;
+  --dur-base: 220ms;
+  --dur-slow: 400ms;
+}
+
+/* ---------------- reset ---------------- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; overflow-x: hidden; }
+body {
+  min-height: 100vh;
+  color: var(--color-ink);
+  background: var(--color-bg);
+  font-family: var(--font-body);
+  font-size: var(--fs-400);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  cursor: default;
+}
+
+/* paper grain over everything */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  opacity: 0.085;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='3'/><feColorMatrix values='0 0 0 0 0.12  0 0 0 0 0.10  0 0 0 0 0.08  0 0 0 0.7 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  z-index: 9000;
+}
+
+h1, h2, h3, .display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: var(--tracking-display);
+  color: var(--color-ink);
+  text-wrap: balance;
+}
+h1, .h1 { font-size: var(--fs-800); line-height: var(--lh-tight); margin: 0 0 var(--sp-5); }
+h2, .h2 { font-size: var(--fs-700); line-height: var(--lh-snug);  margin: 0 0 var(--sp-4); }
+h3, .h3 { font-size: var(--fs-600); line-height: var(--lh-snug);  margin: 0 0 var(--sp-3); }
+
+p { margin: 0 0 var(--sp-4); max-width: 62ch; text-wrap: pretty; }
+a { color: var(--color-ink); text-decoration: none; }
+
+.eyebrow, .smallcaps {
+  font-family: var(--font-caption);
+  font-size: var(--fs-200);
+  font-weight: 400;
+  letter-spacing: var(--tracking-caption);
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+em, .italic { font-style: italic; font-family: var(--font-display); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

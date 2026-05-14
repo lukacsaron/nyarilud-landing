@@ -1,0 +1,37 @@
+.ribbon {
+  position: absolute;
+  z-index: 5;
+  font-family: var(--font-caption);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--nl-charcoal);
+  opacity: 0;
+  animation: rib-in 800ms 1600ms var(--ease-default) forwards;
+}
+@keyframes rib-in { to { opacity: 0.78; } }
+
+.dot   { color: var(--nl-wine); margin: 0 0.6em; }
+
+.link {
+  text-decoration: none;
+  color: inherit;
+  transition: color 220ms var(--ease-default);
+}
+.link:hover { color: var(--nl-wine); }
+
+.tl { top: clamp(22px, 3vw, 36px); left: clamp(22px, 3vw, 40px); }
+.tr { top: clamp(22px, 3vw, 36px); right: clamp(22px, 3vw, 40px); }
+
+.vrule {
+  display: inline-block;
+  width: 1px; height: 0.9em;
+  background: rgba(31,27,23,0.35);
+  vertical-align: middle;
+  margin: 0 0.7em;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 640px) {
+  .ribbon { font-size: 9px; letter-spacing: 0.22em; }
+}

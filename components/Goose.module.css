@@ -1,0 +1,52 @@
+.gooseWrap {
+  position: relative;
+  width: clamp(180px, 22vw, 280px);
+  height: clamp(180px, 22vw, 280px);
+  margin-bottom: clamp(16px, 2vw, 28px);
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  transform: perspective(900px) rotateX(var(--tilt-y)) rotateY(var(--tilt-x));
+  transition: transform 600ms var(--ease-default);
+  cursor: pointer;
+}
+
+.gooseSvg {
+  width: 100%;
+  height: 100%;
+  color: var(--nl-charcoal);
+  overflow: visible;
+  display: block;
+}
+
+.outline {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 5600;
+  stroke-dashoffset: 5600;
+  animation: draw 2600ms 200ms var(--ease-default) forwards;
+}
+@keyframes draw { to { stroke-dashoffset: 0; } }
+
+.fill {
+  fill: currentColor;
+  opacity: 0;
+  animation: fill-in 900ms 2400ms var(--ease-default) forwards;
+}
+@keyframes fill-in { to { opacity: 1; } }
+
+.dot {
+  fill: currentColor;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: dot-pop 340ms var(--delay, 2400ms) var(--ease-default) forwards;
+}
+@keyframes dot-pop {
+  0%   { opacity: 0; transform: scale(0.4); }
+  60%  { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
