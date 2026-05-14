@@ -180,7 +180,7 @@ export function FindUs() {
               <div className={styles.scheduleRow}>
                 <span className={styles.day}>Kedd — Szombat</span>
                 <span className={styles.leader} aria-hidden />
-                <span className={styles.time}>11 — 18</span>
+                <span className={styles.time}>10 — 18</span>
               </div>
               <div className={`${styles.scheduleRow} ${styles.scheduleRowMuted}`}>
                 <span className={styles.day}>Vasárnap, Hétfő</span>
