@@ -23,5 +23,6 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": ["sharp"]
-  }
+  },
+  "packageManager": "pnpm@10.4.1"
 }
