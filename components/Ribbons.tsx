@@ -10,7 +10,7 @@ export function Ribbons() {
       </div>
       <div className={`${styles.ribbon} ${styles.tr}`}>
         <a
-          href="https://instagram.com/nyari.lud"
+          href="https://www.instagram.com/nyarilud/"
           target="_blank"
           rel="noopener noreferrer"
           className={styles.link}

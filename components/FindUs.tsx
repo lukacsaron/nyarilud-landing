@@ -82,6 +82,10 @@ type Status =
   | { open: true }
   | { open: false; nextDayLabel: string | null; nextHour: number };
 
+const OPENING_HOUR = 10;
+const closingHourFor = (day: number) => (day === 5 ? 18 : 15);
+const isOpenDay = (day: number) => day === 2 || day === 3 || day === 4 || day === 5 || day === 6;
+
 function OpenStatus() {
   const [status, setStatus] = useState<Status | null>(null);
 
@@ -102,17 +106,16 @@ function OpenStatus() {
         Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6,
       };
       const day = dayMap[weekdayShort] ?? 0;
-      const isOpenDay = day >= 2 && day <= 6;
-      if (isOpenDay && hour >= 11 && hour < 18) {
+      if (isOpenDay(day) && hour >= OPENING_HOUR && hour < closingHourFor(day)) {
         return { open: true };
       }
       const dayNames = ["vasárnap", "hétfőn", "kedden", "szerdán", "csütörtökön", "pénteken", "szombaton"];
-      if (isOpenDay && hour < 11) {
-        return { open: false, nextDayLabel: "ma", nextHour: 11 };
+      if (isOpenDay(day) && hour < OPENING_HOUR) {
+        return { open: false, nextDayLabel: "ma", nextHour: OPENING_HOUR };
       }
       let next = (day + 1) % 7;
-      while (!(next >= 2 && next <= 6)) next = (next + 1) % 7;
-      return { open: false, nextDayLabel: dayNames[next], nextHour: 11 };
+      while (!isOpenDay(next)) next = (next + 1) % 7;
+      return { open: false, nextDayLabel: dayNames[next], nextHour: OPENING_HOUR };
     };
     setStatus(compute());
     const id = setInterval(() => setStatus(compute()), 60_000);
@@ -178,7 +181,12 @@ export function FindUs() {
             </div>
             <div className={styles.schedule}>
               <div className={styles.scheduleRow}>
-                <span className={styles.day}>Kedd — Szombat</span>
+                <span className={styles.day}>Kedd–Csüt, Szo</span>
+                <span className={styles.leader} aria-hidden />
+                <span className={styles.time}>10 — 15</span>
+              </div>
+              <div className={styles.scheduleRow}>
+                <span className={styles.day}>Péntek</span>
                 <span className={styles.leader} aria-hidden />
                 <span className={styles.time}>10 — 18</span>
               </div>
@@ -207,7 +215,7 @@ export function FindUs() {
               mutasd a térképen <span className={styles.arrow}>→</span>
             </a>
             <a
-              href="https://instagram.com/nyari.lud"
+              href="https://www.instagram.com/nyarilud/"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.link}

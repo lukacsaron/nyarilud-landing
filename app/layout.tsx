@@ -117,12 +117,18 @@ const jsonLd = {
   openingHoursSpecification: [
     {
       "@type": "OpeningHoursSpecification",
-      dayOfWeek: ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-      opens: "11:00",
+      dayOfWeek: ["Tuesday", "Wednesday", "Thursday", "Saturday"],
+      opens: "10:00",
+      closes: "15:00",
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: "Friday",
+      opens: "10:00",
       closes: "18:00",
     },
   ],
-  sameAs: ["https://instagram.com/nyari.lud"],
+  sameAs: ["https://www.instagram.com/nyarilud/"],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
