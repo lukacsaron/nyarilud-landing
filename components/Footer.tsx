@@ -4,7 +4,6 @@ export function Footer() {
   return (
     <footer className={styles.footer}>
       <div className={styles.left}>
-        <span className={styles.gooseMini} aria-hidden />
         <span>© nyári lúd · est. {/* TODO: confirm founding year */}2026 · budapest</span>
       </div>
     </footer>

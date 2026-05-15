@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { HandDrawnMap } from "./HandDrawnMap";
+import { useOpenStatus } from "@/lib/useOpenStatus";
 import styles from "./FindUs.module.css";
 
 const MAPS_URL = "https://maps.google.com/?q=Pozsonyi+%C3%BAt+30%2C+Budapest";
@@ -57,85 +58,43 @@ function EmailLink() {
     if (!navigator.clipboard?.writeText) return;
     e.preventDefault();
     navigator.clipboard
-      .writeText("hello@nyarilud.hu")
+      .writeText("dora@nyarilud.hu")
       .then(() => {
         setCopied(true);
         if (timer.current) clearTimeout(timer.current);
         timer.current = setTimeout(() => setCopied(false), 1500);
       })
       .catch(() => {
-        window.location.href = "mailto:hello@nyarilud.hu";
+        window.location.href = "mailto:dora@nyarilud.hu";
       });
   };
 
   return (
     <span className={styles.emailWrap}>
-      <a href="mailto:hello@nyarilud.hu" onClick={handleClick}>
-        hello@nyarilud.hu
+      <a href="mailto:dora@nyarilud.hu" onClick={handleClick}>
+        dora@nyarilud.hu
       </a>
       {copied && <span className={styles.copiedBadge}>másolva</span>}
     </span>
   );
 }
 
-type Status =
-  | { open: true }
-  | { open: false; nextDayLabel: string | null; nextHour: number };
-
-const OPENING_HOUR = 10;
-const closingHourFor = (day: number) => (day === 5 ? 18 : 15);
-const isOpenDay = (day: number) => day === 2 || day === 3 || day === 4 || day === 5 || day === 6;
-
 function OpenStatus() {
-  const [status, setStatus] = useState<Status | null>(null);
-
-  useEffect(() => {
-    const compute = (): Status => {
-      const now = new Date();
-      const fmt = new Intl.DateTimeFormat("en-US", {
-        timeZone: "Europe/Budapest",
-        weekday: "short",
-        hour: "numeric",
-        hour12: false,
-      });
-      const parts = fmt.formatToParts(now);
-      const weekdayShort = parts.find((p) => p.type === "weekday")?.value ?? "";
-      const hourStr = parts.find((p) => p.type === "hour")?.value ?? "0";
-      const hour = parseInt(hourStr, 10) % 24;
-      const dayMap: Record<string, number> = {
-        Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6,
-      };
-      const day = dayMap[weekdayShort] ?? 0;
-      if (isOpenDay(day) && hour >= OPENING_HOUR && hour < closingHourFor(day)) {
-        return { open: true };
-      }
-      const dayNames = ["vasárnap", "hétfőn", "kedden", "szerdán", "csütörtökön", "pénteken", "szombaton"];
-      if (isOpenDay(day) && hour < OPENING_HOUR) {
-        return { open: false, nextDayLabel: "ma", nextHour: OPENING_HOUR };
-      }
-      let next = (day + 1) % 7;
-      while (!isOpenDay(next)) next = (next + 1) % 7;
-      return { open: false, nextDayLabel: dayNames[next], nextHour: OPENING_HOUR };
-    };
-    setStatus(compute());
-    const id = setInterval(() => setStatus(compute()), 60_000);
-    return () => clearInterval(id);
-  }, []);
-
+  const status = useOpenStatus();
   if (!status) return null;
 
   if (status.open) {
     return (
       <span className={styles.statusPill} data-open="true">
         <span className={styles.statusDot} aria-hidden />
-        most nyitva
+        Most nyitva
       </span>
     );
   }
 
   const label = status.nextDayLabel
-    ? `zárva · ${status.nextDayLabel} ${status.nextHour}-kor nyit`
-    : `zárva · ${status.nextHour}-kor nyit`;
+    ? `Most ZÁRVA · nyitás ${status.nextDayLabel} ${status.nextHour}-kor`
+    : `Most ZÁRVA · nyitás ${status.nextHour}-kor`;
 
   return (
     <span className={styles.statusPill} data-open="false">
@@ -176,7 +135,7 @@ export function FindUs() {
 
           <div className={styles.hoursBlock}>
             <div className={styles.hoursHead}>
-              <span className={styles.hoursLabel}>nyitva</span>
+              <span className={styles.hoursLabel}>nyitvatartás</span>
               <OpenStatus />
             </div>
             <div className={styles.schedule}>
@@ -193,7 +152,7 @@ export function FindUs() {
               <div className={`${styles.scheduleRow} ${styles.scheduleRowMuted}`}>
                 <span className={styles.day}>Vasárnap, Hétfő</span>
                 <span className={styles.leader} aria-hidden />
-                <span className={styles.time}>zárva</span>
+                <span className={styles.time}>ZÁRVA</span>
               </div>
             </div>
           </div>

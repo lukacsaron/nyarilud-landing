@@ -94,7 +94,7 @@ const jsonLd = {
   url: SITE_URL,
   image: `${SITE_URL}${OG_IMAGE}`,
   logo: `${SITE_URL}/nyarilud-logo.svg`,
-  email: "hello@nyarilud.hu",
+  email: "dora@nyarilud.hu",
   address: {
     "@type": "PostalAddress",
     streetAddress: "Pozsonyi út 30",

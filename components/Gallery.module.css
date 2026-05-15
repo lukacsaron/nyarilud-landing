@@ -1,0 +1,195 @@
+.section {
+  position: relative;
+  padding: clamp(120px, 13vw, 180px) clamp(24px, 5vw, 80px) clamp(120px, 13vw, 180px);
+  background: transparent;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* The wall ------------------------------------------------------- */
+.wall {
+  position: relative;
+  z-index: 2;
+  max-width: 1480px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  column-gap: clamp(24px, 2.4vw, 44px);
+  row-gap: clamp(56px, 6vw, 96px);
+  align-items: start;
+}
+
+@media (max-width: 980px) {
+  .wall { grid-template-columns: repeat(6, 1fr); column-gap: 28px; row-gap: 48px; }
+}
+@media (max-width: 620px) {
+  .wall { grid-template-columns: repeat(4, 1fr); column-gap: 24px; row-gap: 40px; }
+}
+
+/* Polaroid ------------------------------------------------------- */
+.figure {
+  position: relative;
+  margin: 0;
+  background: var(--nl-cream-100);
+  padding: 14px 14px 40px;
+  border-radius: 2px;
+  box-shadow:
+    0 14px 32px rgba(31, 15, 12, 0.18),
+    0 2px 4px rgba(31, 15, 12, 0.12);
+  transform: rotate(var(--rot, 0deg));
+  transition:
+    transform 0.45s var(--ease-default),
+    box-shadow 0.45s var(--ease-default),
+    z-index 0s 0.45s;
+  opacity: 0;
+  animation: pinUp 0.7s var(--ease-default) var(--delay, 0ms) forwards;
+
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='34' height='30' viewBox='0 0 34 30'><rect x='1.5' y='7.5' width='29' height='19' rx='2.5' fill='%231F1B17' stroke='%23F4ECDC' stroke-width='1.4'/><rect x='10.5' y='3.5' width='11' height='5' rx='1' fill='%231F1B17' stroke='%23F4ECDC' stroke-width='1.2'/><circle cx='16' cy='17' r='5.8' fill='%23F4ECDC' stroke='%231F1B17' stroke-width='1'/><circle cx='16' cy='17' r='3.2' fill='%231F1B17'/><circle cx='14.4' cy='15.4' r='1.1' fill='%23F4ECDC' opacity='0.75'/><circle cx='26.5' cy='11' r='1.3' fill='%23F2E2A7'/></svg>") 16 17, pointer;
+}
+
+.figure:hover {
+  transform:
+    rotate(calc(var(--rot, 0deg) + var(--hover-tilt, 1.2deg)))
+    translate(var(--hover-x, 0px), -4px);
+  box-shadow:
+    0 22px 44px rgba(31, 15, 12, 0.24),
+    0 4px 10px rgba(31, 15, 12, 0.15);
+  z-index: 30;
+  transition:
+    transform 0.45s var(--ease-default),
+    box-shadow 0.45s var(--ease-default),
+    z-index 0s 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .figure:hover { transform: rotate(var(--rot, 0deg)); }
+}
+
+.ph {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--ar, 1);
+  overflow: hidden;
+  background: var(--nl-cream-300);
+  filter: saturate(0.92) contrast(0.98);
+}
+.ph img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--bp, center);
+}
+
+/* Camera-flash overlay: snap to white, then drift back to the photo */
+.flash {
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: photoFlash 1200ms var(--ease-default) forwards;
+}
+@keyframes photoFlash {
+  0%   { opacity: 0; }
+  4%   { opacity: 1; }
+  18%  { opacity: 0.92; }
+  100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flash { animation: none; opacity: 0; }
+}
+
+/* Washi tape + pushpin ------------------------------------------- */
+.tape {
+  position: absolute;
+  width: 84px;
+  height: 22px;
+  background: rgba(243, 225, 170, 0.78);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 1px 2px rgba(0, 0, 0, 0.07);
+  pointer-events: none;
+}
+.tapeTop {
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%) rotate(var(--tapeRot, -3deg));
+}
+.tapeTl {
+  top: -10px;
+  left: 14px;
+  transform: rotate(-12deg);
+  width: 54px;
+  height: 18px;
+}
+.tapeTr {
+  top: -10px;
+  right: 14px;
+  transform: rotate(8deg);
+  width: 64px;
+  height: 18px;
+}
+.blueTape .tape { background: rgba(168, 181, 184, 0.7); }
+
+.pin {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--nl-wine);
+  box-shadow:
+    0 2px 3px rgba(31, 15, 12, 0.35),
+    inset -2px -2px 3px rgba(0, 0, 0, 0.25),
+    inset 2px 2px 3px rgba(255, 255, 255, 0.25);
+}
+
+/* Placements — three portraits on top, two landscapes below ------ */
+/* Row 1 · portraits (photos 38, 48, 66) */
+.w1 { grid-column: 1 / span 4; grid-row: 1; --rot: -3deg;   --hover-tilt: -1.1deg; --hover-x:  2px; --ar: 0.667; --bp: center; margin-top: 0;    }
+.w2 { grid-column: 5 / span 4; grid-row: 1; --rot: 2deg;    --hover-tilt:  1.3deg; --hover-x: -2px; --ar: 0.667; --bp: center; margin-top: 36px; }
+.w3 { grid-column: 9 / span 4; grid-row: 1; --rot: -2deg;   --hover-tilt: -1.2deg; --hover-x:  3px; --ar: 0.667; --bp: center; margin-top: 14px; }
+/* Row 2 · landscapes (photos 7, 32) — wider, the "scene" shots */
+.w4 { grid-column: 1 / span 6; grid-row: 2; --rot: 3deg;    --hover-tilt:  1deg;   --hover-x: -3px; --ar: 1.5;   --bp: center; margin-top: 0;    }
+.w5 { grid-column: 7 / span 6; grid-row: 2; --rot: -2.5deg; --hover-tilt: -1.1deg; --hover-x:  3px; --ar: 1.5;   --bp: center; margin-top: 44px; }
+
+@media (max-width: 980px) {
+  .w1 { grid-column: 1 / span 3; grid-row: 1; margin-top: 0;    }
+  .w2 { grid-column: 4 / span 3; grid-row: 1; margin-top: 24px; }
+  .w3 { grid-column: 2 / span 4; grid-row: 2; margin-top: 0;    }
+  .w4 { grid-column: 1 / span 6; grid-row: 3; margin-top: 0;    }
+  .w5 { grid-column: 1 / span 6; grid-row: 4; margin-top: 0;    }
+}
+@media (max-width: 620px) {
+  .w1 { grid-column: 1 / span 4; grid-row: 1; --rot: -2deg;   margin-top: 0; }
+  .w2 { grid-column: 1 / span 4; grid-row: 2; --rot: 2deg;    margin-top: 0; }
+  .w3 { grid-column: 1 / span 4; grid-row: 3; --rot: -2deg;   margin-top: 0; }
+  .w4 { grid-column: 1 / span 4; grid-row: 4; --rot: 2deg;    margin-top: 0; }
+  .w5 { grid-column: 1 / span 4; grid-row: 5; --rot: -1.5deg; margin-top: 0; }
+}
+
+.w1 { --delay: 80ms; }
+.w2 { --delay: 220ms; }
+.w3 { --delay: 360ms; }
+.w4 { --delay: 500ms; }
+.w5 { --delay: 640ms; }
+
+@keyframes pinUp {
+  from {
+    opacity: 0;
+    transform: rotate(var(--rot, 0deg)) translateY(-26px) scale(1.04);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(var(--rot, 0deg)) translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .figure { animation: none; opacity: 1; }
+}

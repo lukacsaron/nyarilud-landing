@@ -1,0 +1,27 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  --stripe-w: clamp(56px, 7.4vw, 108px);
+  background: repeating-linear-gradient(
+    90deg,
+    var(--nl-cream-100) 0 var(--stripe-w),
+    var(--nl-dusty-blue) var(--stripe-w) calc(var(--stripe-w) * 2)
+  );
+  animation: backdrop-drift 90s linear infinite;
+  will-change: background-position;
+}
+
+.backdrop[data-hero-in-view="false"] {
+  animation-play-state: paused;
+}
+
+@keyframes backdrop-drift {
+  from { background-position: 0 0; }
+  to   { background-position: calc(var(--stripe-w) * 2) 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop { animation: none; }
+}

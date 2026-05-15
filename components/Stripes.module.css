@@ -1,31 +1,13 @@
-.stripes {
-  position: absolute;
-  inset: -2% -6%;
-  z-index: 0;
-  pointer-events: none;
-  --stripe-w: clamp(56px, 7.4vw, 108px);
-  background: repeating-linear-gradient(
-    90deg,
-    var(--nl-cream-100) 0 var(--stripe-w),
-    var(--nl-dusty-blue) var(--stripe-w) calc(var(--stripe-w) * 2)
-  );
-  transform: translate3d(var(--mx, 0), 0, 0) scaleX(1.02);
-  transition: transform 1200ms var(--ease-default);
-  animation: stripe-drift 90s linear infinite;
-}
-
-@keyframes stripe-drift {
-  from { background-position: 0 0; }
-  to   { background-position: calc(var(--stripe-w) * 2) 0; }
-}
-
-.stripes::before {
-  content: "";
+/* Cream curtain that covers the backdrop on first paint, then retracts
+   right-to-left to reveal the stripes. Lives inside the hero only. */
+.uncover {
   position: absolute;
   inset: 0;
+  z-index: 0;
   background: var(--nl-cream-200);
   animation: stripe-uncover 1800ms var(--ease-default) forwards;
   transform-origin: right center;
+  pointer-events: none;
 }
 @keyframes stripe-uncover {
   0%   { transform: scaleX(1); }

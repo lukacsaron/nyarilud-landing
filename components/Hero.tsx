@@ -7,7 +7,7 @@ import styles from "./Hero.module.css";
 
 export function Hero() {
   return (
-    <section className={styles.hero}>
+    <section className={styles.hero} data-hero>
       <Stripes />
       <Ribbons />
 

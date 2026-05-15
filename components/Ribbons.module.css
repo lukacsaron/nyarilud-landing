@@ -21,7 +21,12 @@
 .link:hover { color: var(--nl-wine); }
 
 .tl { top: clamp(22px, 3vw, 36px); left: clamp(22px, 3vw, 40px); }
-.tr { top: clamp(22px, 3vw, 36px); right: clamp(22px, 3vw, 40px); }
+.tr {
+  top: clamp(22px, 3vw, 36px);
+  right: clamp(22px, 3vw, 40px);
+  display: inline-flex;
+  align-items: center;
+}
 
 .vrule {
   display: inline-block;
@@ -32,6 +37,73 @@
   transform: translateY(-1px);
 }
 
+/* nav open/closed status -------------------------------------- */
+.statusSlot {
+  display: inline-block;
+  min-width: 1px;
+}
+
+.navStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7em;
+  font-family: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  white-space: nowrap;
+}
+
+.navStatus[data-open="false"] {
+  background: var(--nl-cream-200);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 4px 11px 4px 10px;
+  margin-right: 0.3em;
+  color: var(--nl-charcoal-soft);
+}
+
+.navStatusDot {
+  position: relative;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.navStatus[data-open="true"] .navStatusDot {
+  background: #7d8a5a;
+}
+.navStatus[data-open="true"] .navStatusDot::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 999px;
+  border: 1px solid rgba(125, 138, 90, 0.55);
+  animation: nav-status-ping 2200ms var(--ease-out) infinite;
+}
+
+.navStatus[data-open="false"] .navStatusDot {
+  background: var(--nl-sage);
+  opacity: 0.55;
+}
+
+@keyframes nav-status-ping {
+  0%   { transform: scale(0.7); opacity: 0.8; }
+  80%  { transform: scale(1.7); opacity: 0; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navStatus[data-open="true"] .navStatusDot::after { animation: none; }
+}
+
 @media (max-width: 640px) {
   .ribbon { font-size: 9px; letter-spacing: 0.22em; }
+  .navStatus[data-open="false"] { padding: 3px 9px 3px 8px; }
+}
+
+@media (max-width: 520px) {
+  .navStatusDetail { display: none; }
 }
