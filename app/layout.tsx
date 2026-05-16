@@ -6,6 +6,128 @@ import "./globals.css";
 const SITE_URL = "https://nyarilud.hu";
 const OG_IMAGE = "/nyarilud-og.jpg";
 
+const BRANDS_CARRIED = [
+  "Ganni",
+  "Baum und Pferdgarten",
+  "Stine Goya",
+  "Samsøe Samsøe",
+  "Sézane",
+  "Rouje Paris",
+  "Isabel Marant",
+  "Isabel Marant Étoile",
+  "A.P.C.",
+  "&Other Stories",
+  "Arket",
+  "COS",
+  "Wood Wood",
+  "Acne Studios",
+  "Anine Bing",
+  "Lollys Laundry",
+  "Lovechild 1979",
+  "Neo Noir",
+  "Mads Nørgaard Copenhagen",
+  "Second Female",
+  "Stella Nova",
+  "Beck Söndergaard",
+  "Bobo Choses",
+  "Brigitte Herskind",
+  "Cecilie Copenhagen",
+  "DAY Birger et Mikkelsen",
+  "Designers Remix",
+  "Envii",
+  "Esmé Studio",
+  "Gestuz",
+  "Habiba",
+  "Han Kjøbenhavn",
+  "Henrik Vibskov",
+  "Ichi",
+  "InWear",
+  "KA:NT Copenhagen",
+  "Konges Sløjd",
+  "Liberté Essentiel",
+  "Magasin",
+  "Malene Birger",
+  "Mood Copenhagen",
+  "MSCH Copenhagen",
+  "Munthe",
+  "Nümph",
+  "Opera Sport",
+  "Part Two",
+  "Pernilla Wahlgren",
+  "Pieces",
+  "Pure Friday",
+  "Rabens Saloner",
+  "Rodebjer",
+  "Rotate",
+  "Sabina Sommer",
+  "Sand Copenhagen",
+  "Selected Femme",
+  "Sissel Edelbo",
+  "Sisters Point",
+  "Skall Studio",
+  "Sofie Schnoor",
+  "Studio Feder",
+  "Tiger of Sweden",
+  "Trois Pommes",
+  "YAS",
+  "Zadig & Voltaire",
+  "American Vintage",
+  "Atelier Revive",
+  "Boii Studios",
+  "Bongusta",
+  "Celine",
+  "Comme des Garçons",
+  "Comme des Garçons PLAY",
+  "Free People",
+  "IRO Paris",
+  "Kenzo",
+  "Marella",
+  "MAX&Co",
+  "MOTHER",
+  "MSGM Milano",
+  "Nanushka",
+  "Never Fully Dressed",
+  "NoaNoa",
+  "Proenza Schouler",
+  "Sandro Paris",
+  "Scotch & Soda",
+  "Sea New York",
+  "See by Chloé",
+  "Stella McCartney",
+  "Stüssy",
+  "T by Alexander Wang",
+  "The Jogg Concept",
+  "Topshop",
+  "Tory Burch",
+  "Canada Goose",
+  "Carhartt",
+  "Columbia",
+  "Dickies",
+  "Fjäll Räven",
+  "Homeboy",
+  "Ilse Jacobsen",
+  "Karen Millen",
+  "Lee",
+  "Levi's",
+  "Lindex",
+  "Mango",
+  "Monki",
+  "Moves",
+  "NA-KD",
+  "Nike ACG",
+  "Pico",
+  "Ralph Lauren",
+  "The North Face",
+  "Urban Outfitters",
+  "U.S. Polo Assn.",
+  "Vila",
+  "Wrangler",
+  "Zara",
+  "H&M Premium",
+  "H&M Trend",
+  "H&M Edition",
+];
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -13,7 +135,7 @@ export const metadata: Metadata = {
     template: "%s · nyári lúd",
   },
   description:
-    "Kicsi bolt a Pozsonyi úton. Tele ruhákkal, amik már megéltek egy életet — és most új sztorira várnak. Premium preloved divat Újlipótvárosban.",
+    "Premium preloved butik a Pozsonyi úton (Újlipótváros, Budapest). Gondosan válogatott Ganni, Baum und Pferdgarten, Stine Goya, Samsøe Samsøe, Sézane, Isabel Marant, A.P.C., Acne Studios és további skandináv és francia márkák.",
   applicationName: "nyári lúd",
   keywords: [
     "nyári lúd",
@@ -39,10 +161,11 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "hu_HU",
-    url: SITE_URL,
+    url: `${SITE_URL}/`,
     siteName: "nyári lúd",
-    title: "nyári lúd · premium preloved butik",
-    description: "Premium preloved butik · Pozsonyi út 30 · Budapest 1137",
+    title: "nyári lúd · premium preloved butik · Budapest",
+    description:
+      "Premium preloved butik · Pozsonyi út 30 · Budapest 1137. Ganni, Baum und Pferdgarten, Stine Goya, Samsøe Samsøe, Sézane, Isabel Marant és további skandináv & francia márkák.",
     images: [
       {
         url: OG_IMAGE,
@@ -54,8 +177,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "nyári lúd",
-    description: "Premium preloved butik · Pozsonyi út 30 · Budapest 1137",
+    title: "nyári lúd · premium preloved butik · Budapest",
+    description:
+      "Premium preloved butik · Pozsonyi út 30 · Budapest 1137. Ganni, Baum und Pferdgarten, Stine Goya, Samsøe Samsøe és további skandináv & francia márkák.",
     images: [OG_IMAGE],
   },
   robots: {
@@ -83,18 +207,21 @@ export const viewport: Viewport = {
   themeColor: "#F4ECDC",
 };
 
-const jsonLd = {
+const storeJsonLd = {
   "@context": "https://schema.org",
-  "@type": "ClothingStore",
+  "@type": ["ClothingStore", "SecondHandStore"],
   "@id": `${SITE_URL}/#store`,
   name: "nyári lúd",
-  alternateName: "nyari lud",
+  alternateName: ["nyari lud", "Nyári Lúd", "nyári lúd butik"],
   description:
-    "Premium preloved butik a Pozsonyi úton. Gondosan válogatott, megélt ruhák új sztorira várva.",
+    "Premium preloved butik a Pozsonyi úton. Gondosan válogatott, megélt designer ruhák új sztorira várva — Ganni, Baum und Pferdgarten, Stine Goya, Samsøe Samsøe, Sézane, Isabel Marant és további skandináv és francia márkák.",
+  slogan: "Tele ruhákkal, amik már megéltek egy életet — és most új sztorira várnak.",
   url: SITE_URL,
   image: `${SITE_URL}${OG_IMAGE}`,
   logo: `${SITE_URL}/nyarilud-logo.svg`,
   email: "dora@nyarilud.hu",
+  priceRange: "$$",
+  paymentAccepted: ["Cash", "Credit Card", "Debit Card"],
   address: {
     "@type": "PostalAddress",
     streetAddress: "Pozsonyi út 30",
@@ -109,10 +236,10 @@ const jsonLd = {
     longitude: 19.0494,
   },
   hasMap: "https://maps.google.com/?q=Pozsonyi+%C3%BAt+30%2C+Budapest",
-  areaServed: {
-    "@type": "City",
-    name: "Budapest",
-  },
+  areaServed: [
+    { "@type": "City", name: "Budapest" },
+    { "@type": "Country", name: "Hungary" },
+  ],
   currenciesAccepted: "HUF",
   openingHoursSpecification: [
     {
@@ -128,7 +255,55 @@ const jsonLd = {
       closes: "18:00",
     },
   ],
+  knowsAbout: [
+    "premium preloved fashion",
+    "second-hand designer clothing",
+    "vintage fashion",
+    "Scandinavian fashion",
+    "French fashion",
+    "sustainable fashion",
+    "circular fashion",
+    "curated second-hand",
+  ],
+  makesOffer: BRANDS_CARRIED.map((brand) => ({
+    "@type": "Offer",
+    itemOffered: {
+      "@type": "Product",
+      category: "Preloved women's clothing",
+      brand: { "@type": "Brand", name: brand },
+    },
+    availability: "https://schema.org/InStock",
+    itemCondition: "https://schema.org/UsedCondition",
+  })),
   sameAs: ["https://www.instagram.com/nyarilud/"],
+};
+
+const brandsJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "@id": `${SITE_URL}/#brands`,
+  name: "Márkák a nyári lúd butikban",
+  description:
+    "Designer márkák, amelyek rendszeresen elérhetők a nyári lúd preloved butikban (Pozsonyi út 30, Budapest).",
+  numberOfItems: BRANDS_CARRIED.length,
+  itemListElement: BRANDS_CARRIED.map((brand, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    item: {
+      "@type": "Brand",
+      name: brand,
+    },
+  })),
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${SITE_URL}/#website`,
+  url: SITE_URL,
+  name: "nyári lúd",
+  inLanguage: "hu-HU",
+  publisher: { "@id": `${SITE_URL}/#store` },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -141,7 +316,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="ICBM" content="47.5167, 19.0494" />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(storeJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(brandsJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
         <Script id="gtm" strategy="afterInteractive">
           {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
