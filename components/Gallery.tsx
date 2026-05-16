@@ -5,8 +5,8 @@ import Image, { type StaticImageData } from "next/image";
 
 import styles from "./Gallery.module.css";
 
+import photo5 from "../photos/nyari_lud_final_5.JPG_1.5.1.jpg";
 import photo7 from "../photos/nyari_lud_final_7.JPG_1.7.1.jpg";
-import photo32 from "../photos/nyari_lud_final_32.JPG_1.32.1.jpg";
 import photo38 from "../photos/nyari_lud_final_38.JPG_1.38.1.jpg";
 import photo48 from "../photos/nyari_lud_final_48.JPG_1.48.1.jpg";
 import photo66 from "../photos/nyari_lud_final_66.JPG_1.66.1.jpg";
@@ -27,7 +27,7 @@ const photos: Polaroid[] = [
   { slot: 2, src: photo48, alt: "Nyári lúd — hímzett mellény",   pin: "tape-tl", blueTape: true },
   { slot: 3, src: photo66, alt: "Nyári lúd — sárga öv hangtag-gel", pin: "pin" },
   { slot: 4, src: photo7,  alt: "Nyári lúd — boltbelső",          pin: "tape-tr" },
-  { slot: 5, src: photo32, alt: "Nyári lúd — a kirakat",          pin: "tape-top", blueTape: true, tapeRot: "2deg" },
+  { slot: 5, src: photo5,  alt: "Nyári lúd — a kirakat",          pin: "tape-top", blueTape: true, tapeRot: "2deg" },
 ];
 
 function PinElement({ kind, tapeRot }: { kind: PinStyle; tapeRot?: string }) {

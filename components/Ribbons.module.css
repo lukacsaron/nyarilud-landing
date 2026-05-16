@@ -28,6 +28,16 @@
   align-items: center;
 }
 
+.statusInline {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Mobile-only 2nd row containing the status pill */
+.statusRow {
+  display: none;
+}
+
 .vrule {
   display: inline-block;
   width: 1px; height: 0.9em;
@@ -99,11 +109,28 @@
   .navStatus[data-open="true"] .navStatusDot::after { animation: none; }
 }
 
-@media (max-width: 640px) {
+/* ---- mobile: stack to 2 rows, status below brand ---- */
+@media (max-width: 720px) {
   .ribbon { font-size: 9px; letter-spacing: 0.22em; }
+
+  /* hide inline status from TR — Instagram only on the right */
+  .statusInline { display: none; }
+
+  /* show status as its own row below TL, horizontally centered */
+  .statusRow {
+    display: inline-flex;
+    top: calc(clamp(22px, 3vw, 36px) + 22px);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
   .navStatus[data-open="false"] { padding: 3px 9px 3px 8px; }
 }
 
-@media (max-width: 520px) {
-  .navStatusDetail { display: none; }
+/* very small screens: tighten letter-spacing so the closed pill fits */
+@media (max-width: 360px) {
+  .statusRow .navStatus[data-open="false"] {
+    letter-spacing: 0.16em;
+    padding: 3px 8px;
+  }
 }

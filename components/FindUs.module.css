@@ -26,6 +26,23 @@
   }
 }
 
+@media (max-width: 620px) {
+  .title { font-size: clamp(30px, 8vw, 40px); }
+  .hoursHead {
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-start;
+  }
+  .statusPill {
+    white-space: normal;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    padding: 4px 10px;
+  }
+  .scheduleRow .time { font-size: 22px; }
+  .scheduleRowMuted .time { font-size: 17px; }
+}
+
 .mapFrame {
   position: relative;
   display: block;
