@@ -82,24 +82,150 @@
   object-position: var(--bp, center);
 }
 
-/* Camera-flash overlay: snap to white, then drift back to the photo */
-.flash {
+/* Polaroid develop sequence ------------------------------------- */
+/* Stacked overlays inside .ph that together simulate a shutter flash
+   followed by a slow Polaroid development: milky fog → cyan-tinted
+   blur → vignette burn-in → halation bloom → settle. */
+
+.developSeq {
   position: absolute;
   inset: 0;
-  background: #ffffff;
   pointer-events: none;
-  mix-blend-mode: screen;
-  opacity: 0;
-  animation: photoFlash 1200ms var(--ease-default) forwards;
 }
-@keyframes photoFlash {
+.developSeq > span {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  will-change: opacity, background, filter;
+}
+
+/* Smooth sinusoidal ease for crossfades — sin-in-out feel */
+.developSeq { --ease-smooth: cubic-bezier(0.45, 0, 0.55, 1); }
+
+/* 1 · Shutter bloom — warm, soft, peaks well under full white.
+   Single peak, smooth in and out. */
+.flash {
+  background: radial-gradient(
+    ellipse at 50% 42%,
+    rgba(255, 246, 226, 0.78) 0%,
+    rgba(255, 240, 210, 0.48) 32%,
+    rgba(255, 234, 196, 0.18) 58%,
+    rgba(255, 230, 188, 0) 78%
+  );
+  mix-blend-mode: screen;
+  animation: shutterBloom 520ms var(--ease-smooth) forwards;
+}
+@keyframes shutterBloom {
   0%   { opacity: 0; }
-  4%   { opacity: 1; }
-  18%  { opacity: 0.92; }
+  22%  { opacity: 1; }
   100% { opacity: 0; }
 }
+
+/* 2 · Milky undeveloped layer — single rise, long smooth fade so it
+   crossfades naturally with the developing image underneath. */
+.milky {
+  background:
+    radial-gradient(
+      ellipse at 50% 50%,
+      rgba(251, 246, 235, 0.88) 0%,
+      rgba(244, 236, 220, 0.95) 60%,
+      rgba(236, 225, 203, 0.98) 100%
+    );
+  animation: milkyFog 2000ms var(--ease-smooth) forwards;
+}
+@keyframes milkyFog {
+  0%   { opacity: 0; }
+  14%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* 3 · Vignette burn-in — edges darken into sepia, settle at a faint
+   trace so the photo never looks perfectly flat afterwards. */
+.vignette {
+  background: radial-gradient(
+    ellipse at 50% 48%,
+    rgba(40, 22, 14, 0) 38%,
+    rgba(40, 22, 14, 0.18) 70%,
+    rgba(28, 14, 8, 0.42) 92%,
+    rgba(20, 10, 6, 0.55) 100%
+  );
+  mix-blend-mode: multiply;
+  animation: burnIn 2200ms var(--ease-smooth) 200ms forwards;
+}
+@keyframes burnIn {
+  0%   { opacity: 0; }
+  45%  { opacity: 1; }
+  100% { opacity: 0.2; }
+}
+
+/* 4 · Halation — warm highlight bloom that crests with the image
+   resolving, then fades cleanly. */
+.halation {
+  background: radial-gradient(
+    ellipse at 50% 44%,
+    rgba(255, 200, 140, 0.32) 0%,
+    rgba(255, 180, 110, 0.18) 38%,
+    rgba(255, 160, 90, 0) 72%
+  );
+  mix-blend-mode: soft-light;
+  animation: halation 1600ms var(--ease-smooth) 400ms forwards;
+}
+@keyframes halation {
+  0%   { opacity: 0; }
+  45%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* 5 · Image chromatic resolve — driven on .ph[data-shutter] so the
+   filter restarts on every click via animation-name swap.
+   Single peak with smooth interpolation — no hue-rotate (which
+   sweeps through the colour wheel and reads as discrete phases);
+   sepia + desaturation gives a smooth one-tone underdevelopment. */
+.ph[data-shutter="a"] img { animation: developA 2000ms cubic-bezier(0.45, 0, 0.55, 1) forwards; }
+.ph[data-shutter="b"] img { animation: developB 2000ms cubic-bezier(0.45, 0, 0.55, 1) forwards; }
+
+@keyframes developA {
+  0%   { filter: blur(0) saturate(1) contrast(1) brightness(1) sepia(0); }
+  14%  { filter: blur(10px) saturate(0.08) contrast(0.5) brightness(1.25) sepia(0.55); }
+  100% { filter: blur(0) saturate(1) contrast(1) brightness(1) sepia(0); }
+}
+@keyframes developB {
+  0%   { filter: blur(0) saturate(1) contrast(1) brightness(1) sepia(0); }
+  14%  { filter: blur(10px) saturate(0.08) contrast(0.5) brightness(1.25) sepia(0.55); }
+  100% { filter: blur(0) saturate(1) contrast(1) brightness(1) sepia(0); }
+}
+
+/* 6 · Physical jolt on the polaroid itself — feels like a shutter
+   thump. Same parity trick restarts on every click. */
+.figure[data-shutter="a"] { animation: joltA 320ms var(--ease-default) forwards; }
+.figure[data-shutter="b"] { animation: joltB 320ms var(--ease-default) forwards; }
+
+@keyframes joltA {
+  0%   { opacity: 1; transform: rotate(var(--rot, 0deg)); }
+  28%  { opacity: 1; transform: rotate(calc(var(--rot, 0deg) + 0.45deg)) translateY(-3px); }
+  62%  { opacity: 1; transform: rotate(calc(var(--rot, 0deg) - 0.15deg)) translateY(1px); }
+  100% { opacity: 1; transform: rotate(var(--rot, 0deg)); }
+}
+@keyframes joltB {
+  0%   { opacity: 1; transform: rotate(var(--rot, 0deg)); }
+  28%  { opacity: 1; transform: rotate(calc(var(--rot, 0deg) + 0.45deg)) translateY(-3px); }
+  62%  { opacity: 1; transform: rotate(calc(var(--rot, 0deg) - 0.15deg)) translateY(1px); }
+  100% { opacity: 1; transform: rotate(var(--rot, 0deg)); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .flash { animation: none; opacity: 0; }
+  .developSeq > span { animation: none !important; opacity: 0 !important; }
+  .ph[data-shutter] img { animation: none !important; filter: none !important; }
+  .figure[data-shutter] { animation: none !important; }
+  .milky {
+    animation: reducedMilky 320ms var(--ease-default) forwards !important;
+    opacity: 1 !important;
+  }
+}
+@keyframes reducedMilky {
+  0%   { opacity: 0.6; }
+  100% { opacity: 0; }
 }
 
 /* Washi tape + pushpin ------------------------------------------- */

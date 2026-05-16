@@ -61,10 +61,12 @@ export function Gallery() {
         {photos.map((p) => {
           const slotClass = styles[`w${p.slot}` as `w${1|2|3|4|5}`];
           const shutter = shutters[p.slot] ?? 0;
+          const variant = shutter === 0 ? undefined : shutter % 2 === 0 ? "a" : "b";
           return (
             <figure
               key={p.slot}
               className={`${styles.figure} ${slotClass} ${p.blueTape ? styles.blueTape : ""}`}
+              data-shutter={variant}
               role="button"
               tabIndex={0}
               aria-label={p.alt}
@@ -72,7 +74,7 @@ export function Gallery() {
               onKeyDown={(e) => onKey(e, p.slot)}
             >
               <PinElement kind={p.pin} tapeRot={p.tapeRot} />
-              <div className={styles.ph}>
+              <div className={styles.ph} data-shutter={variant}>
                 <Image
                   src={p.src}
                   alt={p.alt}
@@ -81,7 +83,12 @@ export function Gallery() {
                   placeholder="blur"
                 />
                 {shutter > 0 && (
-                  <span key={shutter} className={styles.flash} aria-hidden />
+                  <span key={shutter} className={styles.developSeq} aria-hidden>
+                    <span className={styles.flash} />
+                    <span className={styles.milky} />
+                    <span className={styles.vignette} />
+                    <span className={styles.halation} />
+                  </span>
                 )}
               </div>
             </figure>
