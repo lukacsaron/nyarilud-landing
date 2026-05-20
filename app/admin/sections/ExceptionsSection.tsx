@@ -38,7 +38,7 @@ export function ExceptionsSection({ site }: { site: Site }) {
     const clean: SiteException[] = value.map((ex) =>
       ex.mode === "closed"
         ? { date: ex.date, label: ex.label || undefined, mode: "closed" }
-        : { date: ex.date, label: ex.label || undefined, mode: "custom", opens: ex.opens!, closes: ex.closes! }
+        : { date: ex.date, label: ex.label || undefined, mode: "custom", opens: ex.opens, closes: ex.closes }
     );
     startTransition(async () => {
       const result = await saveExceptionsAction(clean);
@@ -58,16 +58,32 @@ export function ExceptionsSection({ site }: { site: Site }) {
         <h2 className={styles.sectionTitle}>Ünnepek és kivételek</h2>
         {savedAt && <span className={styles.sectionSavedAt}>Mentve {savedAt}</span>}
       </div>
+      <p className={styles.sectionIntro}>
+        Egyszeri, dátumhoz kötött kivételek a heti nyitvatartáson. Pl. Karácsony zárva, vagy egy különleges esemény miatt korábbi nyitás. Az adott napon a nyitóoldalon egy banner is megjelenik.
+      </p>
 
       <div className={styles.exceptionList}>
+        {value.length === 0 && (
+          <p className={styles.exceptionEmpty}>Még nincs kivétel. Vegyél fel egyet a lenti gombbal.</p>
+        )}
         {value.map((ex, i) => (
           <div key={i} className={styles.exceptionCard}>
-            <input type="date" className={styles.input} value={ex.date}
-                   onChange={(e) => update(i, { date: e.target.value })} required />
-            <input className={styles.input} placeholder="címke (pl. Karácsony)"
-                   value={ex.label ?? ""}
-                   onChange={(e) => update(i, { label: e.target.value })} />
-            <div className={styles.exceptionRadio}>
+            <input
+              type="date"
+              className={styles.input}
+              value={ex.date}
+              onChange={(e) => update(i, { date: e.target.value })}
+              required
+              aria-label="Dátum"
+            />
+            <input
+              className={styles.input}
+              placeholder="Címke, pl. Karácsony"
+              value={ex.label ?? ""}
+              onChange={(e) => update(i, { label: e.target.value })}
+              aria-label="Címke"
+            />
+            <div className={styles.exceptionRadio} role="radiogroup" aria-label="Mód">
               <label>
                 <input type="radio" name={`mode-${i}`} checked={ex.mode === "closed"}
                        onChange={() => update(i, { mode: "closed" })} />
@@ -82,10 +98,12 @@ export function ExceptionsSection({ site }: { site: Site }) {
             {ex.mode === "custom" && (
               <div className={styles.exceptionTimes}>
                 <input type="time" className={styles.input} value={ex.opens ?? "10:00"}
-                       onChange={(e) => update(i, { opens: e.target.value })} />
+                       onChange={(e) => update(i, { opens: e.target.value })}
+                       aria-label="Nyitás" />
                 <span aria-hidden>—</span>
                 <input type="time" className={styles.input} value={ex.closes ?? "15:00"}
-                       onChange={(e) => update(i, { closes: e.target.value })} />
+                       onChange={(e) => update(i, { closes: e.target.value })}
+                       aria-label="Zárás" />
               </div>
             )}
             <button type="button" className={styles.trashBtn} onClick={() => remove(i)} aria-label="Törlés">

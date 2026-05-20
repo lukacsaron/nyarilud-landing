@@ -50,6 +50,9 @@ export function HoursSection({ site }: { site: Site }) {
         <h2 className={styles.sectionTitle}>Nyitvatartás</h2>
         {savedAt && <span className={styles.sectionSavedAt}>Mentve {savedAt}</span>}
       </div>
+      <p className={styles.sectionIntro}>
+        A bolt heti nyitvatartása. A „Merre vagyunk” rovat, a „Most nyitva” jelzés és a Google strukturált adatok is ezeket az értékeket használják. Egyedi napokat (pl. ünnepek) a lent található Ünnepek szekcióban tudsz beállítani.
+      </p>
 
       <div role="grid">
         {DAY_KEYS.map((k) => {

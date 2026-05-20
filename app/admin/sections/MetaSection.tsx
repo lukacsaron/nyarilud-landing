@@ -32,6 +32,12 @@ function fromSite(s: Site): Initial {
   };
 }
 
+function charState(len: number, recommended: number, max: number): "ok" | "warn" | "over" {
+  if (len > max) return "over";
+  if (len > recommended) return "warn";
+  return "ok";
+}
+
 export function MetaSection({ site }: { site: Site }) {
   const initial = fromSite(site);
   const { value, setValue, dirty, reset } = useDirtyForm<Initial>(initial);
@@ -59,45 +65,87 @@ export function MetaSection({ site }: { site: Site }) {
     });
   };
 
+  const titleState = charState(value.title.length, 60, 70);
+  const descState = charState(value.description.length, 160, 200);
+
   return (
     <form id="oldal" className={styles.section} onSubmit={onSubmit}>
       <div className={styles.sectionHead}>
         <h2 className={styles.sectionTitle}>Oldal alapok</h2>
         {savedAt && <span className={styles.sectionSavedAt}>Mentve {savedAt}</span>}
       </div>
+      <p className={styles.sectionIntro}>
+        A bolt nyitóoldalának fő szövegei és a Google találatokban megjelenő információk.
+      </p>
 
-      <label className={styles.field}>
-        Cím
-        <input className={styles.input} value={value.title} onChange={onChange("title")} required />
-      </label>
-      <label className={styles.field}>
-        Leírás
-        <textarea className={styles.textarea} value={value.description} onChange={onChange("description")} required />
-      </label>
-      <label className={styles.field}>
-        Szlogen <small>(Enter új sort jelent a Hero szövegében)</small>
-        <textarea className={styles.textarea} value={value.slogan} onChange={onChange("slogan")} required />
-      </label>
-      <label className={styles.field}>
-        E-mail
-        <input className={styles.input} type="email" value={value.email} onChange={onChange("email")} required />
-      </label>
-      <label className={styles.field}>
-        Cím (utca, házszám)
-        <input className={styles.input} value={value.streetAddress} onChange={onChange("streetAddress")} required />
-      </label>
-      <label className={styles.field}>
-        Város
-        <input className={styles.input} value={value.addressLocality} onChange={onChange("addressLocality")} required />
-      </label>
-      <label className={styles.field}>
-        Irányítószám
-        <input className={styles.input} value={value.postalCode} onChange={onChange("postalCode")} required />
-      </label>
-      <label className={styles.field}>
-        Városrész
-        <input className={styles.input} value={value.neighborhood} onChange={onChange("neighborhood")} required />
-      </label>
+      <div className={styles.fieldGroup}>
+        <div className={styles.fieldGroupLabel}>Keresőmotorok és közösségi média</div>
+
+        <label className={styles.field}>
+          <span className={styles.fieldLabel}>Cím</span>
+          <span className={styles.fieldHelp}>
+            Ez jelenik meg a böngésző fülön és a Google találatok címeként. 50–60 karakter optimális.
+          </span>
+          <input className={styles.input} value={value.title} onChange={onChange("title")} required maxLength={70} />
+          <span className={styles.charCount} data-state={titleState}>{value.title.length} / 60</span>
+        </label>
+
+        <label className={styles.field}>
+          <span className={styles.fieldLabel}>Leírás</span>
+          <span className={styles.fieldHelp}>
+            A Google találatok és a megosztott linkek (Facebook, Instagram) alatt jelenik meg. 150–160 karakter a legjobb.
+          </span>
+          <textarea className={styles.textarea} value={value.description} onChange={onChange("description")} required maxLength={200} />
+          <span className={styles.charCount} data-state={descState}>{value.description.length} / 160</span>
+        </label>
+      </div>
+
+      <div className={styles.fieldGroup}>
+        <div className={styles.fieldGroupLabel}>A nyitóoldalon</div>
+
+        <label className={styles.field}>
+          <span className={styles.fieldLabel}>Szlogen</span>
+          <span className={styles.fieldHelp}>
+            A nyitóoldal nagy szövegblokkja, közvetlenül a logó alatt. Új sort Enterrel kezdesz.
+          </span>
+          <textarea className={styles.textarea} value={value.slogan} onChange={onChange("slogan")} required />
+        </label>
+      </div>
+
+      <div className={styles.fieldGroup}>
+        <div className={styles.fieldGroupLabel}>Kapcsolat</div>
+
+        <label className={styles.field}>
+          <span className={styles.fieldLabel}>E-mail</span>
+          <span className={styles.fieldHelp}>
+            A „Merre vagyunk” részben jelenik meg, kattintható linkként. Ide érkeznek a vásárlói levelek.
+          </span>
+          <input className={styles.input} type="email" value={value.email} onChange={onChange("email")} required />
+        </label>
+
+        <label className={styles.field}>
+          <span className={styles.fieldLabel}>Utca, házszám</span>
+          <span className={styles.fieldHelp}>Megjelenik a „Merre vagyunk” részben és a Google strukturált adatokban.</span>
+          <input className={styles.input} value={value.streetAddress} onChange={onChange("streetAddress")} required />
+        </label>
+
+        <div className={styles.fieldRow}>
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>Város</span>
+            <input className={styles.input} value={value.addressLocality} onChange={onChange("addressLocality")} required />
+          </label>
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>Irányítószám</span>
+            <input className={styles.input} value={value.postalCode} onChange={onChange("postalCode")} required />
+          </label>
+        </div>
+
+        <label className={styles.field}>
+          <span className={styles.fieldLabel}>Városrész</span>
+          <span className={styles.fieldHelp}>Pl. „Újlipótváros”. Csak a bolt címkártyáján jelenik meg.</span>
+          <input className={styles.input} value={value.neighborhood} onChange={onChange("neighborhood")} required />
+        </label>
+      </div>
 
       {error && <p className={styles.error}>{error}</p>}
 

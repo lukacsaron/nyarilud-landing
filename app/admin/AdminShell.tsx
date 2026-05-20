@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { logoutAction } from "./login/actions";
+import { AdminNav } from "./AdminNav";
 import styles from "./admin.module.css";
 
 export function AdminShell({ user, children }: { user: string; children: React.ReactNode }) {
@@ -17,7 +18,10 @@ export function AdminShell({ user, children }: { user: string; children: React.R
           </form>
         </div>
       </header>
-      <main className={styles.main}>{children}</main>
+      <div className={styles.layout}>
+        <AdminNav />
+        <main className={styles.main}>{children}</main>
+      </div>
     </div>
   );
 }

@@ -17,6 +17,20 @@ import { useDirtyRegistration } from "../DirtyTracker";
 import { useToast } from "../Toast";
 import styles from "../admin.module.css";
 
+import seed1 from "@/photos/nyari_lud_final_38.JPG_1.38.1.jpg";
+import seed2 from "@/photos/nyari_lud_final_48.JPG_1.48.1.jpg";
+import seed3 from "@/photos/nyari_lud_final_66.JPG_1.66.1.jpg";
+import seed4 from "@/photos/nyari_lud_final_7.JPG_1.7.1.jpg";
+import seed5 from "@/photos/nyari_lud_final_5.JPG_1.5.1.jpg";
+
+const SEED_THUMBS: Record<string, string> = {
+  "seed-1": seed1.src,
+  "seed-2": seed2.src,
+  "seed-3": seed3.src,
+  "seed-4": seed4.src,
+  "seed-5": seed5.src,
+};
+
 const PIN_OPTIONS: { value: SitePhoto["pin"]; label: string }[] = [
   { value: "tape-top", label: "felül szalag" },
   { value: "tape-tl",  label: "bal sarok szalag" },
@@ -37,7 +51,7 @@ type Tile = {
 };
 
 function tileFromSitePhoto(p: SitePhoto): Tile {
-  const previewSrc = p.id.startsWith("seed-") ? "/seed-thumb.jpg" : `/photos/${p.id}.webp`;
+  const previewSrc = SEED_THUMBS[p.id] ?? `/photos/${p.id}.webp`;
   return {
     uid: p.id,
     slot: p.slot,
@@ -58,15 +72,18 @@ function SortableTile({ tile, onChange }: { tile: Tile; onChange: (patch: Partia
       className={styles.tile}
       style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 }}
     >
+      <div className={styles.tileSlotLabel}>{tile.slot}. hely</div>
       <div className={styles.tileDrag} {...attributes} {...listeners} aria-label="Áthelyezés">⋮⋮</div>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={src} alt="" className={styles.tileImg} />
+      <span className={styles.tileFieldLabel}>Leírás (alt szöveg)</span>
       <input
         className={styles.input}
-        placeholder="Leírás (alt szöveg)"
+        placeholder="Mit ábrázol a kép?"
         value={tile.alt}
         onChange={(e) => onChange({ alt: e.target.value })}
       />
+      <span className={styles.tileFieldLabel}>Stílus</span>
       <select
         className={styles.input}
         value={tile.pin}
@@ -185,6 +202,9 @@ export function GallerySection({ site }: { site: Site }) {
         <h2 className={styles.sectionTitle}>Galéria</h2>
         {savedAt && <span className={styles.sectionSavedAt}>Mentve {savedAt}</span>}
       </div>
+      <p className={styles.sectionIntro}>
+        Öt polaroid stílusú fotó a nyitóoldalon. A sorrend balról jobbra felel meg a lent látható helyeknek (1–5). Húzd át a csempéket az átrendezéshez. A kép legalább 1200 px széles legyen, max 25 MB.
+      </p>
 
       <div {...getRootProps()} className={`${styles.dropzone}${isDragActive ? ` ${styles.dropzoneActive}` : ""}`}>
         <input {...getInputProps()} />
