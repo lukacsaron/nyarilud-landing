@@ -266,3 +266,64 @@
     grid-column: 1 / -1;
   }
 }
+
+.dropzone {
+  border: 2px dashed #c44a73;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  text-align: center;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  background: #fff;
+  color: #555;
+}
+
+.dropzoneActive {
+  background: #fceaee;
+  color: #c44a73;
+}
+
+.tileRow {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.75rem;
+}
+
+.tile {
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 0.5rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.tileDrag {
+  cursor: grab;
+  font-size: 0.9rem;
+  color: #888;
+  text-align: center;
+  user-select: none;
+}
+
+.tileImg {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 6px;
+  background: #eee;
+}
+
+.tileToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  color: #555;
+}
+
+@media (max-width: 720px) {
+  .tileRow {
+    grid-template-columns: 1fr 1fr;
+  }
+}

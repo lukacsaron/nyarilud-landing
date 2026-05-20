@@ -1,5 +1,6 @@
 import { getSite } from "@/lib/site/getSite";
 import { MetaSection } from "./sections/MetaSection";
+import { GallerySection } from "./sections/GallerySection";
 import { HoursSection } from "./sections/HoursSection";
 import { ExceptionsSection } from "./sections/ExceptionsSection";
 
@@ -10,6 +11,7 @@ export default async function AdminPage() {
   return (
     <>
       <MetaSection site={site} />
+      <GallerySection site={site} />
       <HoursSection site={site} />
       <ExceptionsSection site={site} />
     </>
