@@ -131,11 +131,11 @@ const BRANDS_CARRIED = [
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "nyári lúd · premium preloved butik · Budapest",
+    default: "nyári lúd · premium preloved boutique · Budapest",
     template: "%s · nyári lúd",
   },
   description:
-    "Premium preloved butik a Pozsonyi úton (Újlipótváros, Budapest). Gondosan válogatott Ganni, Baum und Pferdgarten, Stine Goya, Samsøe Samsøe, Sézane, Isabel Marant, A.P.C., Acne Studios és további skandináv és francia márkák.",
+    "Premium preloved boutique a Pozsonyi úton (Újlipótváros, Budapest). Gondosan válogatott Ganni, Baum und Pferdgarten, Stine Goya, Samsøe Samsøe, Sézane, Isabel Marant, A.P.C., Acne Studios és további skandináv és francia márkák.",
   applicationName: "nyári lúd",
   keywords: [
     "nyári lúd",
@@ -143,7 +143,7 @@ export const metadata: Metadata = {
     "vintage Budapest",
     "second hand Budapest",
     "Pozsonyi út",
-    "Újlipótváros butik",
+    "Újlipótváros boutique",
     "vintage divat",
     "premium preloved",
   ],
@@ -163,23 +163,23 @@ export const metadata: Metadata = {
     locale: "hu_HU",
     url: `${SITE_URL}/`,
     siteName: "nyári lúd",
-    title: "nyári lúd · premium preloved butik · Budapest",
+    title: "nyári lúd · premium preloved boutique · Budapest",
     description:
-      "Premium preloved butik · Pozsonyi út 30 · Budapest 1137. Ganni, Baum und Pferdgarten, Stine Goya, Samsøe Samsøe, Sézane, Isabel Marant és további skandináv & francia márkák.",
+      "Premium preloved boutique · Pozsonyi út 30 · Budapest 1137. Ganni, Baum und Pferdgarten, Stine Goya, Samsøe Samsøe, Sézane, Isabel Marant és további skandináv & francia márkák.",
     images: [
       {
         url: OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: "nyári lúd — premium preloved butik · Pozsonyi út 30, Budapest",
+        alt: "nyári lúd — premium preloved boutique · Pozsonyi út 30, Budapest",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "nyári lúd · premium preloved butik · Budapest",
+    title: "nyári lúd · premium preloved boutique · Budapest",
     description:
-      "Premium preloved butik · Pozsonyi út 30 · Budapest 1137. Ganni, Baum und Pferdgarten, Stine Goya, Samsøe Samsøe és további skandináv & francia márkák.",
+      "Premium preloved boutique · Pozsonyi út 30 · Budapest 1137. Ganni, Baum und Pferdgarten, Stine Goya, Samsøe Samsøe és további skandináv & francia márkák.",
     images: [OG_IMAGE],
   },
   robots: {
@@ -212,9 +212,9 @@ const storeJsonLd = {
   "@type": ["ClothingStore", "SecondHandStore"],
   "@id": `${SITE_URL}/#store`,
   name: "nyári lúd",
-  alternateName: ["nyari lud", "Nyári Lúd", "nyári lúd butik"],
+  alternateName: ["nyari lud", "Nyári Lúd", "nyári lúd boutique"],
   description:
-    "Premium preloved butik a Pozsonyi úton. Gondosan válogatott, megélt designer ruhák új sztorira várva — Ganni, Baum und Pferdgarten, Stine Goya, Samsøe Samsøe, Sézane, Isabel Marant és további skandináv és francia márkák.",
+    "Premium preloved boutique a Pozsonyi úton. Gondosan válogatott, megélt designer ruhák új sztorira várva — Ganni, Baum und Pferdgarten, Stine Goya, Samsøe Samsøe, Sézane, Isabel Marant és további skandináv és francia márkák.",
   slogan: "Tele ruhákkal, amik már megéltek egy életet — és most új sztorira várnak.",
   url: SITE_URL,
   image: `${SITE_URL}${OG_IMAGE}`,
@@ -282,9 +282,9 @@ const brandsJsonLd = {
   "@context": "https://schema.org",
   "@type": "ItemList",
   "@id": `${SITE_URL}/#brands`,
-  name: "Márkák a nyári lúd butikban",
+  name: "Márkák a nyári lúd boutiqueban",
   description:
-    "Designer márkák, amelyek rendszeresen elérhetők a nyári lúd preloved butikban (Pozsonyi út 30, Budapest).",
+    "Designer márkák, amelyek rendszeresen elérhetők a nyári lúd preloved boutiqueban (Pozsonyi út 30, Budapest).",
   numberOfItems: BRANDS_CARRIED.length,
   itemListElement: BRANDS_CARRIED.map((brand, index) => ({
     "@type": "ListItem",
