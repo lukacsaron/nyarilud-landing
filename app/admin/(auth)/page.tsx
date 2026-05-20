@@ -1,8 +1,8 @@
 import { getSite } from "@/lib/site/getSite";
-import { MetaSection } from "./sections/MetaSection";
-import { GallerySection } from "./sections/GallerySection";
-import { HoursSection } from "./sections/HoursSection";
-import { ExceptionsSection } from "./sections/ExceptionsSection";
+import { MetaSection } from "../sections/MetaSection";
+import { GallerySection } from "../sections/GallerySection";
+import { HoursSection } from "../sections/HoursSection";
+import { ExceptionsSection } from "../sections/ExceptionsSection";
 
 export const dynamic = "force-dynamic";
 
