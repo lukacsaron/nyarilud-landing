@@ -354,3 +354,12 @@
 @media (prefers-reduced-motion: reduce) {
   .statusPill[data-open="true"] .statusDot::after { animation: none; }
 }
+
+.banner {
+  margin: 0.5rem 0 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px dashed currentColor;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}

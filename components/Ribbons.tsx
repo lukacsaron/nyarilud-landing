@@ -1,6 +1,7 @@
 "use client";
 
 import { useOpenStatus, type OpenStatus } from "@/lib/useOpenStatus";
+import type { Site } from "@/lib/site/schema";
 import styles from "./Ribbons.module.css";
 
 function NavOpenStatusInner({ status }: { status: OpenStatus | null }) {
@@ -36,8 +37,8 @@ function NavOpenStatusInner({ status }: { status: OpenStatus | null }) {
   );
 }
 
-export function Ribbons() {
-  const status = useOpenStatus();
+export function Ribbons({ site }: { site: Site }) {
+  const status = useOpenStatus(site);
   return (
     <>
       <div className={`${styles.ribbon} ${styles.tl}`}>

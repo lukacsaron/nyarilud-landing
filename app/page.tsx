@@ -3,14 +3,16 @@ import { Hero } from "@/components/Hero";
 import { Gallery } from "@/components/Gallery";
 import { FindUs } from "@/components/FindUs";
 import { Footer } from "@/components/Footer";
+import { getSite } from "@/lib/site/getSite";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const site = await getSite();
   return (
     <main>
       <Backdrop />
-      <Hero />
+      <Hero slogan={site.meta.slogan} site={site} />
       <Gallery />
-      <FindUs />
+      <FindUs site={site} />
       <Footer />
     </main>
   );
