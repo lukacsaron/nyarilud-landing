@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import {
   DndContext, closestCenter, KeyboardSensor, PointerSensor,
   useSensor, useSensors, type DragEndEvent,
@@ -12,6 +13,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { useDropzone } from "react-dropzone";
 import type { Site, SitePhoto } from "@/lib/site/schema";
+import { useDirtyRegistration } from "../DirtyTracker";
 import { useToast } from "../Toast";
 import styles from "../admin.module.css";
 
@@ -86,19 +88,23 @@ function SortableTile({ tile, onChange }: { tile: Tile; onChange: (patch: Partia
 
 export function GallerySection({ site }: { site: Site }) {
   const [tiles, setTiles] = useState<Tile[]>(() => site.gallery.map(tileFromSitePhoto));
+  const [baseline, setBaseline] = useState<string>(() => JSON.stringify(site.gallery));
   const [error, setError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const toast = useToast();
+  const router = useRouter();
 
+  const baselineItems = (JSON.parse(baseline) as SitePhoto[]).map((p, i) => ({
+    slot: i + 1, alt: p.alt, pin: p.pin, blueTape: p.blueTape,
+    tapeRot: p.tapeRot, sourceKind: "existing", id: p.id,
+  }));
   const dirty = JSON.stringify(tiles.map((t, i) => ({
     slot: i + 1, alt: t.alt, pin: t.pin, blueTape: t.blueTape,
     tapeRot: t.tapeRot, sourceKind: t.source.kind,
     id: t.source.kind === "existing" ? t.source.id : null,
-  }))) !== JSON.stringify(site.gallery.map((p, i) => ({
-    slot: i + 1, alt: p.alt, pin: p.pin, blueTape: p.blueTape,
-    tapeRot: p.tapeRot, sourceKind: "existing", id: p.id,
-  })));
+  }))) !== JSON.stringify(baselineItems);
+  useDirtyRegistration("gallery", dirty);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -164,9 +170,12 @@ export function GallerySection({ site }: { site: Site }) {
         setError(body.error ?? "Mentés sikertelen");
         return;
       }
+      const newTiles = (body.gallery as SitePhoto[]).map(tileFromSitePhoto);
+      setTiles(newTiles);
+      setBaseline(JSON.stringify(body.gallery));
       setSavedAt(new Date().toLocaleTimeString("hu-HU", { hour: "2-digit", minute: "2-digit" }));
       toast.push({ text: "Galéria mentve", href: "/" });
-      window.location.reload();
+      router.refresh();
     });
   };
 

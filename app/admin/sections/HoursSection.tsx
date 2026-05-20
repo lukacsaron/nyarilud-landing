@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { DAY_KEYS, type DayKey, type Site } from "@/lib/site/schema";
 import { saveHoursAction } from "../actions";
 import { useDirtyForm } from "../hooks/useDirtyForm";
+import { useDirtyRegistration } from "../DirtyTracker";
 import { useToast } from "../Toast";
 import styles from "../admin.module.css";
 
@@ -23,6 +24,7 @@ export function HoursSection({ site }: { site: Site }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const toast = useToast();
+  useDirtyRegistration("hours", dirty);
 
   const setDay = (k: DayKey, patch: Partial<Site["hours"][DayKey]>) =>
     setValue((v) => ({ ...v, [k]: { ...v[k], ...patch } }));

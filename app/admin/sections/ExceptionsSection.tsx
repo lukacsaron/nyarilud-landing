@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import type { Site, SiteException } from "@/lib/site/schema";
 import { saveExceptionsAction } from "../actions";
 import { useDirtyForm } from "../hooks/useDirtyForm";
+import { useDirtyRegistration } from "../DirtyTracker";
 import { useToast } from "../Toast";
 import styles from "../admin.module.css";
 
@@ -21,6 +22,7 @@ export function ExceptionsSection({ site }: { site: Site }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const toast = useToast();
+  useDirtyRegistration("exceptions", dirty);
 
   const add = () => setValue((v) => [...v, blankException()]);
   const update = (i: number, patch: Partial<SiteException>) =>

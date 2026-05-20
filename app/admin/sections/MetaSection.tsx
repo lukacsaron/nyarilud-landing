@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import type { Site } from "@/lib/site/schema";
 import { saveMetaAction } from "../actions";
 import { useDirtyForm } from "../hooks/useDirtyForm";
+import { useDirtyRegistration } from "../DirtyTracker";
 import { useToast } from "../Toast";
 import styles from "../admin.module.css";
 
@@ -38,6 +39,7 @@ export function MetaSection({ site }: { site: Site }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const toast = useToast();
+  useDirtyRegistration("meta", dirty);
 
   const onChange = (k: keyof Initial) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setValue((v) => ({ ...v, [k]: e.target.value }));
