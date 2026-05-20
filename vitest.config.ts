@@ -5,6 +5,11 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["lib/**/*.test.ts"],
+    server: {
+      deps: {
+        inline: ["next"],
+      },
+    },
   },
   resolve: {
     alias: {
