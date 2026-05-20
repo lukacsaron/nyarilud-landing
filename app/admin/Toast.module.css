@@ -1,0 +1,33 @@
+.region {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  display: grid;
+  gap: 0.5rem;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.toast {
+  background: #1a1a1a;
+  color: #F4ECDC;
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  display: flex;
+  gap: 0.85rem;
+  align-items: center;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+  pointer-events: auto;
+  animation: slideIn 0.2s ease-out;
+}
+
+.link {
+  color: #F4ECDC;
+  text-decoration: underline;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(8px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
