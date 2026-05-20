@@ -236,7 +236,7 @@ const storeJsonLd = {
     latitude: 47.5167,
     longitude: 19.0494,
   },
-  hasMap: "https://maps.google.com/?q=Pozsonyi+%C3%BAt+30%2C+Budapest",
+  hasMap: "https://maps.app.goo.gl/BJohLrrUkpDCzEyU9",
   areaServed: [
     { "@type": "City", name: "Budapest" },
     { "@type": "Country", name: "Hungary" },

@@ -5,7 +5,7 @@ import { HandDrawnMap } from "./HandDrawnMap";
 import { useOpenStatus } from "@/lib/useOpenStatus";
 import styles from "./FindUs.module.css";
 
-const MAPS_URL = "https://maps.google.com/?q=Pozsonyi+%C3%BAt+30%2C+Budapest";
+const MAPS_URL = "https://maps.app.goo.gl/BJohLrrUkpDCzEyU9";
 const VERBS = ["nézelődj", "bóklássz", "időzz", "próbálj"];
 
 function CyclingVerb() {
