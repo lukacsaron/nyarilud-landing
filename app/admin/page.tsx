@@ -1,8 +1,17 @@
 import { getSite } from "@/lib/site/getSite";
+import { MetaSection } from "./sections/MetaSection";
+import { HoursSection } from "./sections/HoursSection";
+import { ExceptionsSection } from "./sections/ExceptionsSection";
+
+export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
   const site = await getSite();
   return (
-    <p>Admin pull-through OK. Title: <strong>{site.meta.title}</strong></p>
+    <>
+      <MetaSection site={site} />
+      <HoursSection site={site} />
+      <ExceptionsSection site={site} />
+    </>
   );
 }
