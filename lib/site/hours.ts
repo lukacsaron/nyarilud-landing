@@ -151,3 +151,91 @@ function compositeLabel(runs: SignatureRun[]): HoursGroup[] {
 export function toHumanGroups(site: Site): HoursGroup[] {
   return compositeLabel(groupRuns(site));
 }
+
+export type OpenStatus =
+  | { open: true }
+  | { open: false; nextDayLabel: string | null; nextHour: number };
+
+const NEXT_DAY_HU: Record<DayKey, string> = {
+  mon: "hétfőn",
+  tue: "kedden",
+  wed: "szerdán",
+  thu: "csütörtökön",
+  fri: "pénteken",
+  sat: "szombaton",
+  sun: "vasárnap",
+};
+
+function budapestParts(now: Date): { dayKey: DayKey; isoDate: string; hour: number; minute: number } {
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Europe/Budapest",
+    weekday: "short",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  const parts = Object.fromEntries(fmt.formatToParts(now).map((p) => [p.type, p.value]));
+  const weekdayShortToKey: Record<string, DayKey> = {
+    Sun: "sun", Mon: "mon", Tue: "tue", Wed: "wed", Thu: "thu", Fri: "fri", Sat: "sat",
+  };
+  return {
+    dayKey: weekdayShortToKey[parts.weekday],
+    isoDate: `${parts.year}-${parts.month}-${parts.day}`,
+    hour: parseInt(parts.hour, 10) % 24,
+    minute: parseInt(parts.minute, 10),
+  };
+}
+
+function parseHHMM(s: string): { h: number; m: number } {
+  return { h: parseInt(s.slice(0, 2), 10), m: parseInt(s.slice(3, 5), 10) };
+}
+
+function effectiveHoursToday(site: Site, isoDate: string, dayKey: DayKey):
+  | { closed: true }
+  | { closed: false; opens: string; closes: string } {
+  const ex = site.exceptions.find((e) => e.date === isoDate);
+  if (ex) {
+    if (ex.mode === "closed") return { closed: true };
+    return { closed: false, opens: ex.opens!, closes: ex.closes! };
+  }
+  const d = site.hours[dayKey];
+  return d.closed ? { closed: true } : { closed: false, opens: d.opens, closes: d.closes };
+}
+
+function findNextOpening(site: Site, fromKey: DayKey): { nextDayLabel: string | null; nextHour: number } {
+  for (let i = 1; i <= 7; i++) {
+    const k = DAY_KEYS[(DAY_KEYS.indexOf(fromKey) + i) % 7];
+    const d = site.hours[k];
+    if (!d.closed) {
+      return { nextDayLabel: NEXT_DAY_HU[k], nextHour: parseHHMM(d.opens).h };
+    }
+  }
+  return { nextDayLabel: null, nextHour: 10 };
+}
+
+export function statusAt(site: Site, now: Date): OpenStatus {
+  const { dayKey, isoDate, hour, minute } = budapestParts(now);
+  const today = effectiveHoursToday(site, isoDate, dayKey);
+  if (!today.closed) {
+    const o = parseHHMM(today.opens);
+    const c = parseHHMM(today.closes);
+    const nowMin = hour * 60 + minute;
+    const openMin = o.h * 60 + o.m;
+    const closeMin = c.h * 60 + c.m;
+    if (nowMin >= openMin && nowMin < closeMin) return { open: true };
+    if (nowMin < openMin) return { open: false, nextDayLabel: "ma", nextHour: o.h };
+  }
+  return { open: false, ...findNextOpening(site, dayKey) };
+}
+
+export function todaysExceptionBanner(site: Site, now: Date): string | null {
+  const { isoDate } = budapestParts(now);
+  const ex = site.exceptions.find((e) => e.date === isoDate);
+  if (!ex) return null;
+  const labelPrefix = ex.label ? `${ex.label} — ` : "";
+  if (ex.mode === "closed") return `${labelPrefix}ma ZÁRVA`;
+  return `${labelPrefix}ma ${parseInt(ex.opens!, 10)} — ${parseInt(ex.closes!, 10)}`;
+}

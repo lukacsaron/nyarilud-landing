@@ -2,6 +2,9 @@ import { describe, it, expect } from "vitest";
 import { DEFAULT_SITE } from "./schema";
 import { toOpeningHoursSpecification } from "./hours";
 import { toHumanGroups } from "./hours";
+import { statusAt, todaysExceptionBanner } from "./hours";
+
+function at(iso: string): Date { return new Date(iso); }
 
 describe("toOpeningHoursSpecification", () => {
   it("emits one entry per open day with matching times", () => {
@@ -54,5 +57,60 @@ describe("toHumanGroups", () => {
     expect(toHumanGroups(allClosed)).toEqual([
       { label: "Hét–Vas", time: "ZÁRVA", muted: true },
     ]);
+  });
+});
+
+describe("statusAt", () => {
+  it("reports open during a weekday's regular hours", () => {
+    // Friday 2026-05-22 at 11:00 Budapest = 09:00 UTC
+    expect(statusAt(DEFAULT_SITE, at("2026-05-22T09:00:00Z"))).toEqual({ open: true });
+  });
+
+  it("reports closed before opening with nextDayLabel 'ma'", () => {
+    // Tuesday 2026-05-19 at 08:00 Budapest = 06:00 UTC
+    expect(statusAt(DEFAULT_SITE, at("2026-05-19T06:00:00Z"))).toEqual({
+      open: false, nextDayLabel: "ma", nextHour: 10,
+    });
+  });
+
+  it("reports closed after hours, points to next open day", () => {
+    // Saturday 2026-05-23 at 16:00 Budapest (closes 15:00) → next open is Tuesday "kedden"
+    expect(statusAt(DEFAULT_SITE, at("2026-05-23T14:00:00Z"))).toEqual({
+      open: false, nextDayLabel: "kedden", nextHour: 10,
+    });
+  });
+
+  it("respects a 'closed' exception for today", () => {
+    const site = {
+      ...DEFAULT_SITE,
+      exceptions: [{ date: "2026-05-22", mode: "closed" as const, label: "Karácsony" }],
+    };
+    // Friday 11:00 — would be open, but exception closes it
+    expect(statusAt(site, at("2026-05-22T09:00:00Z")).open).toBe(false);
+  });
+
+  it("respects a 'custom' exception for today", () => {
+    const site = {
+      ...DEFAULT_SITE,
+      exceptions: [{ date: "2026-05-22", mode: "custom" as const, opens: "12:00", closes: "14:00" }],
+    };
+    // 11:00 → still closed
+    expect(statusAt(site, at("2026-05-22T09:00:00Z")).open).toBe(false);
+    // 13:00 → open
+    expect(statusAt(site, at("2026-05-22T11:00:00Z")).open).toBe(true);
+  });
+});
+
+describe("todaysExceptionBanner", () => {
+  it("returns null when no exception today", () => {
+    expect(todaysExceptionBanner(DEFAULT_SITE, at("2026-05-22T09:00:00Z"))).toBeNull();
+  });
+
+  it("returns the label + 'ma zárva' for a labeled closed exception today", () => {
+    const site = {
+      ...DEFAULT_SITE,
+      exceptions: [{ date: "2026-05-22", mode: "closed" as const, label: "Karácsony" }],
+    };
+    expect(todaysExceptionBanner(site, at("2026-05-22T09:00:00Z"))).toBe("Karácsony — ma ZÁRVA");
   });
 });
