@@ -55,7 +55,10 @@ export const SiteSchema = z.object({
     fri: DaySchema, sat: DaySchema, sun: DaySchema,
   }),
   exceptions: z.array(ExceptionSchema),
-  gallery: z.array(PhotoSchema).length(5),
+  gallery: z.array(PhotoSchema).length(5).refine(
+    (arr) => new Set(arr.map((p) => p.slot)).size === arr.length,
+    { message: "gallery slots must be unique" }
+  ),
 });
 
 export type Site = z.infer<typeof SiteSchema>;

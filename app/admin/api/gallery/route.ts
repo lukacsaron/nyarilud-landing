@@ -149,26 +149,33 @@ export async function POST(req: Request) {
     return Response.json({ ok: false, error: (err as Error).message }, { status: 400 });
   }
 
-  await swapPhotosDir({
-    live: PHOTOS_DIR,
-    build: async (staging) => {
-      for (const o of outputs) {
-        const isSeed = o.sidecar.id.startsWith("seed-");
-        if (o.webp) {
-          await fs.writeFile(path.join(staging, `${o.sidecar.id}.webp`), o.webp);
-          await atomicWriteJson(path.join(staging, `${o.sidecar.id}.json`), o.sidecar);
-        } else if (!isSeed) {
-          const src = path.join(PHOTOS_DIR, `${o.sidecar.id}.webp`);
-          const srcSidecar = path.join(PHOTOS_DIR, `${o.sidecar.id}.json`);
-          await fs.copyFile(src, path.join(staging, `${o.sidecar.id}.webp`));
-          await fs.copyFile(srcSidecar, path.join(staging, `${o.sidecar.id}.json`));
+  try {
+    await swapPhotosDir({
+      live: PHOTOS_DIR,
+      build: async (staging) => {
+        for (const o of outputs) {
+          const isSeed = o.sidecar.id.startsWith("seed-");
+          if (o.webp) {
+            await fs.writeFile(path.join(staging, `${o.sidecar.id}.webp`), o.webp);
+            await atomicWriteJson(path.join(staging, `${o.sidecar.id}.json`), o.sidecar);
+          } else if (!isSeed) {
+            const src = path.join(PHOTOS_DIR, `${o.sidecar.id}.webp`);
+            const srcSidecar = path.join(PHOTOS_DIR, `${o.sidecar.id}.json`);
+            await fs.copyFile(src, path.join(staging, `${o.sidecar.id}.webp`));
+            await fs.copyFile(srcSidecar, path.join(staging, `${o.sidecar.id}.json`));
+          }
         }
-      }
-    },
-  });
+      },
+    });
 
-  const gallery = outputs.map(o => o.sidecar) as [SitePhoto, SitePhoto, SitePhoto, SitePhoto, SitePhoto];
-  await saveSite({ ...current, gallery });
+    const gallery = outputs.map(o => o.sidecar);
+    await saveSite({ ...current, gallery });
 
-  return Response.json({ ok: true, gallery });
+    return Response.json({ ok: true, gallery });
+  } catch (err) {
+    return Response.json(
+      { ok: false, error: `mentés sikertelen: ${(err as Error).message}` },
+      { status: 500 }
+    );
+  }
 }

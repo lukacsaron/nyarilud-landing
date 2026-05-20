@@ -25,7 +25,7 @@ export function buildStoreJsonLd(
       "@type": "PostalAddress",
       streetAddress: site.contact.address.streetAddress,
       addressLocality: site.contact.address.addressLocality,
-      addressRegion: site.contact.address.addressLocality,
+      addressRegion: "Budapest",
       postalCode: site.contact.address.postalCode,
       addressCountry: "HU",
     },

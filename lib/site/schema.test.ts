@@ -28,6 +28,20 @@ describe("SiteSchema", () => {
     expect(SiteSchema.safeParse(ok).success).toBe(true);
   });
 
+  it("rejects a gallery with duplicate slot values", () => {
+    const dup = {
+      ...DEFAULT_SITE,
+      gallery: [
+        { ...DEFAULT_SITE.gallery[0] },
+        { ...DEFAULT_SITE.gallery[1], slot: 1 as const }, // duplicate slot
+        { ...DEFAULT_SITE.gallery[2] },
+        { ...DEFAULT_SITE.gallery[3] },
+        { ...DEFAULT_SITE.gallery[4] },
+      ],
+    };
+    expect(SiteSchema.safeParse(dup).success).toBe(false);
+  });
+
   it("rejects invalid time values like 25:99 or 00:60", () => {
     const bad = {
       ...DEFAULT_SITE,

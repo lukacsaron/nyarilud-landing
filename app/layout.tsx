@@ -9,6 +9,10 @@ import { BRANDS_CARRIED } from "@/lib/brands";
 const SITE_URL = "https://nyarilud.hu";
 const OG_IMAGE = "/nyarilud-og.jpg";
 
+function ldJson(obj: unknown): string {
+  return JSON.stringify(obj).replace(/<\//g, "<\\/");
+}
+
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSite();
   return {
@@ -89,15 +93,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <meta name="ICBM" content="47.5167, 19.0494" />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(storeJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: ldJson(storeJsonLd) }}
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(brandsJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: ldJson(brandsJsonLd) }}
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: ldJson(websiteJsonLd) }}
         />
         <Script id="gtm" strategy="afterInteractive">
           {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
