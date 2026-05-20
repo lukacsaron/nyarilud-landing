@@ -99,6 +99,32 @@ describe("statusAt", () => {
     // 13:00 → open
     expect(statusAt(site, at("2026-05-22T11:00:00Z")).open).toBe(true);
   });
+
+  it("reports closed exactly at the closing minute", () => {
+    // Friday 2026-05-22 at 18:00 Budapest (closing time) = 16:00 UTC
+    // Friday closes at 18:00 per DEFAULT_SITE
+    const result = statusAt(DEFAULT_SITE, at("2026-05-22T16:00:00Z"));
+    expect(result.open).toBe(false);
+  });
+
+  it("reports open one minute before closing", () => {
+    // Friday 17:59 Budapest = 15:59 UTC
+    const result = statusAt(DEFAULT_SITE, at("2026-05-22T15:59:00Z"));
+    expect(result).toEqual({ open: true });
+  });
+
+  it("respects half-hour times in a custom exception", () => {
+    const site = {
+      ...DEFAULT_SITE,
+      exceptions: [{ date: "2026-05-22", mode: "custom" as const, opens: "10:30", closes: "12:30" }],
+    };
+    // 10:15 Budapest = 08:15 UTC — still closed
+    expect(statusAt(site, at("2026-05-22T08:15:00Z")).open).toBe(false);
+    // 10:45 Budapest = 08:45 UTC — open
+    expect(statusAt(site, at("2026-05-22T08:45:00Z")).open).toBe(true);
+    // 12:30 Budapest = 10:30 UTC — closed exactly at close
+    expect(statusAt(site, at("2026-05-22T10:30:00Z")).open).toBe(false);
+  });
 });
 
 describe("todaysExceptionBanner", () => {

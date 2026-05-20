@@ -39,7 +39,7 @@ pnpm test
 |-------------------|--------------------------------------------------|
 | `ADMIN_USER`      | admin login username                             |
 | `ADMIN_PASSWORD`  | admin login password                             |
-| `SESSION_SECRET`  | 32+ random bytes for HMAC signing the session    |
+| `SESSION_SECRET`  | 64-char hex (32 random bytes) — generate with `openssl rand -hex 32` |
 | `SITE_DATA_DIR`   | (optional) overrides the default `/data` path    |
 
 ## Editing content

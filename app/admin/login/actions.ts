@@ -13,10 +13,9 @@ function sleep(ms: number) { return new Promise((r) => setTimeout(r, ms)); }
 
 export async function loginAction(_prev: LoginState, formData: FormData): Promise<LoginState> {
   const h = await headers();
-  const ip =
-    h.get("x-forwarded-for")?.split(",")[0].trim() ??
-    h.get("x-real-ip") ??
-    "anon";
+  const xff = h.get("x-forwarded-for");
+  const xffRightmost = xff?.split(",").map((s) => s.trim()).filter(Boolean).pop();
+  const ip = h.get("x-real-ip") ?? xffRightmost ?? "anon";
 
   if (!loginLimiter.check(ip)) {
     await sleep(1_000);

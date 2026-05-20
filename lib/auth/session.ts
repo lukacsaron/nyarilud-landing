@@ -8,8 +8,8 @@ let keyPromise: Promise<CryptoKey> | null = null;
 function getKey(): Promise<CryptoKey> {
   if (!keyPromise) {
     const secret = process.env.SESSION_SECRET;
-    if (!secret || secret.length < 16) {
-      throw new Error("SESSION_SECRET missing or shorter than 16 chars");
+    if (!secret || secret.length < 32) {
+      throw new Error("SESSION_SECRET missing or shorter than 32 chars (use: openssl rand -hex 32)");
     }
     keyPromise = crypto.subtle.importKey(
       "raw", enc.encode(secret),
