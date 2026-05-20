@@ -11,7 +11,7 @@ export default async function HomePage() {
     <main>
       <Backdrop />
       <Hero slogan={site.meta.slogan} site={site} />
-      <Gallery />
+      <Gallery photos={site.gallery} />
       <FindUs site={site} />
       <Footer />
     </main>
