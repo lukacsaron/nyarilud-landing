@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const TimeHHMM = z.string().regex(/^\d{2}:\d{2}$/, "expected HH:MM");
+const TimeHHMM = z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/, "expected HH:MM (00:00–23:59)");
 
 const DaySchema = z.object({
   closed: z.boolean(),

@@ -27,4 +27,25 @@ describe("SiteSchema", () => {
     };
     expect(SiteSchema.safeParse(ok).success).toBe(true);
   });
+
+  it("rejects invalid time values like 25:99 or 00:60", () => {
+    const bad = {
+      ...DEFAULT_SITE,
+      hours: { ...DEFAULT_SITE.hours, fri: { closed: false, opens: "25:99", closes: "18:00" } },
+    };
+    expect(SiteSchema.safeParse(bad).success).toBe(false);
+
+    const bad2 = {
+      ...DEFAULT_SITE,
+      hours: { ...DEFAULT_SITE.hours, fri: { closed: false, opens: "10:00", closes: "00:60" } },
+    };
+    expect(SiteSchema.safeParse(bad2).success).toBe(false);
+
+    const good = {
+      ...DEFAULT_SITE,
+      hours: { ...DEFAULT_SITE.hours, fri: { closed: false, opens: "23:59", closes: "00:00" } },
+    };
+    // "23:59" and "00:00" are both valid times (the schema doesn't enforce open < close)
+    expect(SiteSchema.safeParse(good).success).toBe(true);
+  });
 });
