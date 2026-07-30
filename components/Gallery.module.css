@@ -12,23 +12,27 @@
   z-index: 2;
   max-width: 1480px;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
   column-gap: clamp(24px, 2.4vw, 44px);
   row-gap: clamp(56px, 6vw, 96px);
-  align-items: start;
 }
 
 @media (max-width: 980px) {
-  .wall { grid-template-columns: repeat(6, 1fr); column-gap: 28px; row-gap: 48px; }
+  .wall { column-gap: 28px; row-gap: 48px; }
 }
 @media (max-width: 620px) {
-  .wall { grid-template-columns: repeat(4, 1fr); column-gap: 24px; row-gap: 40px; }
+  .wall { column-gap: 24px; row-gap: 40px; }
 }
 
 /* Polaroid ------------------------------------------------------- */
 .figure {
   position: relative;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: clamp(220px, 26vw, 340px);
   margin: 0;
   background: var(--nl-cream-100);
   padding: 14px 14px 40px;
@@ -275,35 +279,26 @@
     inset 2px 2px 3px rgba(255, 255, 255, 0.25);
 }
 
-/* Placements — three portraits on top, two landscapes below ------ */
-/* Row 1 · portraits (photos 38, 48, 66) */
-.w1 { grid-column: 1 / span 4; grid-row: 1; --rot: -3deg;   --hover-tilt: -1.1deg; --hover-x:  2px; --ar: 0.667; --bp: center; margin-top: 0;    }
-.w2 { grid-column: 5 / span 4; grid-row: 1; --rot: 2deg;    --hover-tilt:  1.3deg; --hover-x: -2px; --ar: 0.667; --bp: center; margin-top: 36px; }
-.w3 { grid-column: 9 / span 4; grid-row: 1; --rot: -2deg;   --hover-tilt: -1.2deg; --hover-x:  3px; --ar: 0.667; --bp: center; margin-top: 14px; }
-/* Row 2 · landscapes (photos 7, 32) — wider, the "scene" shots */
-.w4 { grid-column: 1 / span 6; grid-row: 2; --rot: 3deg;    --hover-tilt:  1deg;   --hover-x: -3px; --ar: 1.5;   --bp: center; margin-top: 0;    }
-.w5 { grid-column: 7 / span 6; grid-row: 2; --rot: -2.5deg; --hover-tilt: -1.1deg; --hover-x:  3px; --ar: 1.5;   --bp: center; margin-top: 44px; }
+/* Size by content orientation — portrait photos read narrow, landscapes
+   wider, so the wall keeps its curated feel at any count. Aspect ratio
+   (--ar) is set inline per photo from its real dimensions. */
+.figure[data-orient="landscape"] { width: clamp(300px, 40vw, 470px); }
+.figure[data-orient="square"]    { width: clamp(240px, 30vw, 380px); }
 
-@media (max-width: 980px) {
-  .w1 { grid-column: 1 / span 3; grid-row: 1; margin-top: 0;    }
-  .w2 { grid-column: 4 / span 3; grid-row: 1; margin-top: 24px; }
-  .w3 { grid-column: 2 / span 4; grid-row: 2; margin-top: 0;    }
-  .w4 { grid-column: 1 / span 6; grid-row: 3; margin-top: 0;    }
-  .w5 { grid-column: 1 / span 6; grid-row: 4; margin-top: 0;    }
-}
+/* Decorative per-position values — rotation, hover feel, entrance delay,
+   and a gentle vertical stagger for the pinned-up look. The flex wall +
+   content aspect ratio handle the actual layout, so this adapts to 1–5. */
+.w1 { --rot: -3deg;   --hover-tilt: -1.1deg; --hover-x:  2px; --delay: 80ms;  margin-top: 0;    }
+.w2 { --rot: 2deg;    --hover-tilt:  1.3deg; --hover-x: -2px; --delay: 220ms; margin-top: 30px; }
+.w3 { --rot: -2deg;   --hover-tilt: -1.2deg; --hover-x:  3px; --delay: 360ms; margin-top: 12px; }
+.w4 { --rot: 3deg;    --hover-tilt:  1deg;   --hover-x: -3px; --delay: 500ms; margin-top: 0;    }
+.w5 { --rot: -2.5deg; --hover-tilt: -1.1deg; --hover-x:  3px; --delay: 640ms; margin-top: 34px; }
+
 @media (max-width: 620px) {
-  .w1 { grid-column: 1 / span 4; grid-row: 1; --rot: -2deg;   margin-top: 0; }
-  .w2 { grid-column: 1 / span 4; grid-row: 2; --rot: 2deg;    margin-top: 0; }
-  .w3 { grid-column: 1 / span 4; grid-row: 3; --rot: -2deg;   margin-top: 0; }
-  .w4 { grid-column: 1 / span 4; grid-row: 4; --rot: 2deg;    margin-top: 0; }
-  .w5 { grid-column: 1 / span 4; grid-row: 5; --rot: -1.5deg; margin-top: 0; }
+  .figure[data-orient] { width: min(88vw, 420px); margin-top: 0; }
+  .w1, .w3, .w5 { --rot: -2deg; }
+  .w2, .w4 { --rot: 2deg; }
 }
-
-.w1 { --delay: 80ms; }
-.w2 { --delay: 220ms; }
-.w3 { --delay: 360ms; }
-.w4 { --delay: 500ms; }
-.w5 { --delay: 640ms; }
 
 @keyframes pinUp {
   from {

@@ -43,7 +43,7 @@ const MetaItem = z.discriminatedUnion("kind", [
     tapeRot: z.string().optional(),
   }),
 ]);
-const MetaArray = z.array(MetaItem).length(5);
+const MetaArray = z.array(MetaItem).min(1).max(5);
 
 function originOk(host: string | null, origin: string | null): boolean {
   if (!origin) return false;
@@ -77,9 +77,10 @@ export async function POST(req: Request) {
     return Response.json({ ok: false, error: meta.error.issues.map(i => i.message).join("; ") }, { status: 400 });
   }
 
-  const slots = meta.data.map(m => m.slot).sort();
-  if (JSON.stringify(slots) !== JSON.stringify([1, 2, 3, 4, 5])) {
-    return Response.json({ ok: false, error: "minden slot kötelező (1..5)" }, { status: 400 });
+  const slots = meta.data.map(m => m.slot).sort((a, b) => a - b);
+  const expectedSlots = Array.from({ length: meta.data.length }, (_, i) => i + 1);
+  if (JSON.stringify(slots) !== JSON.stringify(expectedSlots)) {
+    return Response.json({ ok: false, error: `a slotoknak folytonosnak kell lenniük (1..${meta.data.length})` }, { status: 400 });
   }
 
   const newKeys = meta.data

@@ -20,6 +20,21 @@ const SEED_SOURCES: Record<string, { src: typeof seed1 }> = {
   "seed-5": { src: seed5 },
 };
 
+const AR_MIN = 0.6;
+const AR_MAX = 1.6;
+
+/** Display aspect ratio (width/height), clamped so nothing is absurdly tall/wide. */
+function clampAr(w: number, h: number): number {
+  if (!w || !h) return 1;
+  return Math.min(AR_MAX, Math.max(AR_MIN, w / h));
+}
+
+function orientOf(ar: number): "portrait" | "square" | "landscape" {
+  if (ar < 0.9) return "portrait";
+  if (ar > 1.15) return "landscape";
+  return "square";
+}
+
 function PinElement({ kind, tapeRot }: { kind: SitePhoto["pin"]; tapeRot?: string }) {
   if (kind === "pin") return <span className={styles.pin} aria-hidden />;
   const cls =
@@ -55,10 +70,14 @@ export function Gallery({ photos }: { photos: SitePhoto[] }) {
           const shutter = shutters[p.slot] ?? 0;
           const variant = shutter === 0 ? undefined : shutter % 2 === 0 ? "a" : "b";
           const seed = SEED_SOURCES[p.id];
+          const ar = seed ? clampAr(seed.src.width, seed.src.height) : clampAr(p.width, p.height);
+          const orient = orientOf(ar);
           return (
             <figure key={p.slot}
                     className={`${styles.figure} ${slotClass} ${p.blueTape ? styles.blueTape : ""}`}
                     data-shutter={variant}
+                    data-orient={orient}
+                    style={{ ["--ar" as string]: ar } as React.CSSProperties}
                     role="button" tabIndex={0} aria-label={p.alt}
                     onClick={() => fire(p.slot)}
                     onKeyDown={(e) => onKey(e, p.slot)}>
