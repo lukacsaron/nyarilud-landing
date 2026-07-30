@@ -55,7 +55,7 @@ export const SiteSchema = z.object({
     fri: DaySchema, sat: DaySchema, sun: DaySchema,
   }),
   exceptions: z.array(ExceptionSchema),
-  gallery: z.array(PhotoSchema).length(5).refine(
+  gallery: z.array(PhotoSchema).min(1).max(5).refine(
     (arr) => new Set(arr.map((p) => p.slot)).size === arr.length,
     { message: "gallery slots must be unique" }
   ),

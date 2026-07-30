@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   DndContext, closestCenter, KeyboardSensor, PointerSensor,
@@ -31,6 +31,9 @@ const SEED_THUMBS: Record<string, string> = {
   "seed-5": seed5.src,
 };
 
+const MAX_TILES = 5;
+const ACCEPT = { "image/*": [".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif"] };
+
 const PIN_OPTIONS: { value: SitePhoto["pin"]; label: string }[] = [
   { value: "tape-top", label: "felül szalag" },
   { value: "tape-tl",  label: "bal sarok szalag" },
@@ -38,9 +41,11 @@ const PIN_OPTIONS: { value: SitePhoto["pin"]; label: string }[] = [
   { value: "pin",      label: "rajzszög" },
 ];
 
+type Slot = 1 | 2 | 3 | 4 | 5;
+
 type Tile = {
   uid: string;
-  slot: 1 | 2 | 3 | 4 | 5;
+  slot: Slot;
   alt: string;
   pin: SitePhoto["pin"];
   blueTape: boolean;
@@ -49,6 +54,12 @@ type Tile = {
     | { kind: "existing"; id: string; previewSrc: string }
     | { kind: "new"; file: File; fileKey: string; previewUrl: string };
 };
+
+type Pending = { file: File; fileKey: string; previewUrl: string };
+
+function newFileKey(): string {
+  return `f-${Math.random().toString(36).slice(2)}`;
+}
 
 function tileFromSitePhoto(p: SitePhoto): Tile {
   const previewSrc = SEED_THUMBS[p.id] ?? `/photos/${p.id}.webp`;
@@ -63,9 +74,45 @@ function tileFromSitePhoto(p: SitePhoto): Tile {
   };
 }
 
-function SortableTile({ tile, onChange }: { tile: Tile; onChange: (patch: Partial<Tile>) => void }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: tile.uid });
+/** New tile from an uploaded file, appended at the given slot. */
+function tileFromFile(file: File, slot: Slot): Tile {
+  const fileKey = newFileKey();
+  return {
+    uid: `tile-${fileKey}`,
+    slot,
+    alt: "",
+    pin: "tape-top",
+    blueTape: false,
+    source: { kind: "new", file, fileKey, previewUrl: URL.createObjectURL(file) },
+  };
+}
+
+function renumber(tiles: Tile[]): Tile[] {
+  return tiles.map((t, i) => ({ ...t, slot: (i + 1) as Slot }));
+}
+
+/** Revoke the objectURL a tile owns, if it holds an unsaved upload. */
+function revokeTile(t: Tile) {
+  if (t.source.kind === "new") URL.revokeObjectURL(t.source.previewUrl);
+}
+
+function SortableTile({
+  tile, canRemove, targeting,
+  onChange, onReplace, onRemove, onPlace,
+}: {
+  tile: Tile;
+  canRemove: boolean;
+  targeting: boolean;
+  onChange: (patch: Partial<Tile>) => void;
+  onReplace: (file: File) => void;
+  onRemove: () => void;
+  onPlace: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: tile.uid, disabled: targeting });
+  const fileRef = useRef<HTMLInputElement>(null);
   const src = tile.source.kind === "existing" ? tile.source.previewSrc : tile.source.previewUrl;
+
   return (
     <div
       ref={setNodeRef}
@@ -73,9 +120,54 @@ function SortableTile({ tile, onChange }: { tile: Tile; onChange: (patch: Partia
       style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 }}
     >
       <div className={styles.tileSlotLabel}>{tile.slot}. hely</div>
-      <div className={styles.tileDrag} {...attributes} {...listeners} aria-label="Áthelyezés">⋮⋮</div>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src} alt="" className={styles.tileImg} />
+      <div
+        className={styles.tileDrag}
+        {...(targeting ? {} : attributes)}
+        {...(targeting ? {} : listeners)}
+        aria-label="Áthelyezés"
+      >⋮⋮</div>
+
+      <div className={styles.tileImgWrap}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src} alt="" className={styles.tileImg} />
+        {targeting && (
+          <button type="button" className={styles.tileTargetBtn} onClick={onPlace}>
+            Ide
+          </button>
+        )}
+      </div>
+
+      <input
+        ref={fileRef}
+        type="file"
+        accept=".jpg,.jpeg,.png,.webp,.heic,.heif,image/*"
+        hidden
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) onReplace(f);
+          e.target.value = "";
+        }}
+      />
+      <div className={styles.tileActions}>
+        <button
+          type="button"
+          className={styles.tileBtn}
+          onClick={() => fileRef.current?.click()}
+          disabled={targeting}
+        >
+          Csere
+        </button>
+        <button
+          type="button"
+          className={`${styles.tileBtn} ${styles.tileBtnDanger}`}
+          onClick={onRemove}
+          disabled={targeting || !canRemove}
+          title={canRemove ? "Kép eltávolítása" : "Legalább egy képnek maradnia kell"}
+        >
+          Törlés
+        </button>
+      </div>
+
       <span className={styles.tileFieldLabel}>Leírás (alt szöveg)</span>
       <input
         className={styles.input}
@@ -106,11 +198,15 @@ function SortableTile({ tile, onChange }: { tile: Tile; onChange: (patch: Partia
 export function GallerySection({ site }: { site: Site }) {
   const [tiles, setTiles] = useState<Tile[]>(() => site.gallery.map(tileFromSitePhoto));
   const [baseline, setBaseline] = useState<string>(() => JSON.stringify(site.gallery));
+  const [pendingQueue, setPendingQueue] = useState<Pending[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const toast = useToast();
   const router = useRouter();
+
+  const targeting = pendingQueue.length > 0;
+  const canRemove = tiles.length > 1;
 
   const baselineItems = (JSON.parse(baseline) as SitePhoto[]).map((p, i) => ({
     slot: i + 1, alt: p.alt, pin: p.pin, blueTape: p.blueTape,
@@ -128,6 +224,15 @@ export function GallerySection({ site }: { site: Site }) {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
+  // Cancel targeting on Escape.
+  useEffect(() => {
+    if (!targeting) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") cancelTargeting(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targeting]);
+
   const updateTile = (uid: string, patch: Partial<Tile>) =>
     setTiles((prev) => prev.map((t) => (t.uid === uid ? { ...t, ...patch } : t)));
 
@@ -137,33 +242,69 @@ export function GallerySection({ site }: { site: Site }) {
     setTiles((prev) => {
       const oldI = prev.findIndex((t) => t.uid === active.id);
       const newI = prev.findIndex((t) => t.uid === over.id);
-      return arrayMove(prev, oldI, newI).map((t, i) => ({ ...t, slot: (i + 1) as Tile["slot"] }));
+      return renumber(arrayMove(prev, oldI, newI));
     });
   };
 
+  const removeTile = (uid: string) =>
+    setTiles((prev) => {
+      if (prev.length <= 1) return prev;
+      const target = prev.find((t) => t.uid === uid);
+      if (target) revokeTile(target);
+      return renumber(prev.filter((t) => t.uid !== uid));
+    });
+
+  const replaceTileFile = (uid: string, file: File) =>
+    setTiles((prev) => prev.map((t) => {
+      if (t.uid !== uid) return t;
+      revokeTile(t);
+      const fileKey = newFileKey();
+      return { ...t, source: { kind: "new", file, fileKey, previewUrl: URL.createObjectURL(file) } };
+    }));
+
+  const onDrop = (accepted: File[]) => {
+    if (accepted.length === 0) return;
+    const room = Math.max(0, MAX_TILES - tiles.length);
+    const toAdd = accepted.slice(0, room);
+    const toQueue = accepted.slice(room);
+    if (toAdd.length > 0) {
+      setTiles((prev) => renumber([
+        ...prev,
+        ...toAdd.map((f, i) => tileFromFile(f, (prev.length + i + 1) as Slot)),
+      ]));
+    }
+    if (toQueue.length > 0) {
+      setPendingQueue((prev) => [
+        ...prev,
+        ...toQueue.map((f) => {
+          const fileKey = newFileKey();
+          return { file: f, fileKey, previewUrl: URL.createObjectURL(f) };
+        }),
+      ]);
+    }
+  };
+
+  const placePending = (uid: string) => {
+    const head = pendingQueue[0];
+    if (!head) return;
+    setTiles((prev) => prev.map((t) => {
+      if (t.uid !== uid) return t;
+      revokeTile(t);
+      return { ...t, source: { kind: "new", file: head.file, fileKey: head.fileKey, previewUrl: head.previewUrl } };
+    }));
+    setPendingQueue((prev) => prev.slice(1));
+  };
+
+  const cancelTargeting = () =>
+    setPendingQueue((prev) => {
+      prev.forEach((p) => URL.revokeObjectURL(p.previewUrl));
+      return [];
+    });
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: { "image/*": [".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif"] },
+    accept: ACCEPT,
     maxSize: 25 * 1024 * 1024,
-    onDrop: (accepted) => {
-      if (accepted.length === 0) return;
-      setTiles((prev) => {
-        const next = [...prev];
-        for (const file of accepted) {
-          const seedIdx = next.findIndex((t) => t.source.kind === "existing" && t.source.id.startsWith("seed-"));
-          const newIdx = next.findIndex((t) => t.source.kind === "new");
-          const idx = seedIdx >= 0 ? seedIdx : (newIdx >= 0 ? newIdx : next.length - 1);
-          const fileKey = `f-${Math.random().toString(36).slice(2)}`;
-          const previewUrl = URL.createObjectURL(file);
-          const old = next[idx];
-          next[idx] = {
-            ...old,
-            uid: `tile-${fileKey}`,
-            source: { kind: "new", file, fileKey, previewUrl },
-          };
-        }
-        return next;
-      });
-    },
+    onDrop,
   });
 
   const onSubmit = (e: React.FormEvent) => {
@@ -171,7 +312,7 @@ export function GallerySection({ site }: { site: Site }) {
     setError(null);
     const formData = new FormData();
     const meta = tiles.map((t, i) => {
-      const slot = (i + 1) as Tile["slot"];
+      const slot = (i + 1) as Slot;
       if (t.source.kind === "existing") {
         return { kind: "keep", id: t.source.id, slot, alt: t.alt, pin: t.pin, blueTape: t.blueTape, tapeRot: t.tapeRot };
       }
@@ -203,21 +344,46 @@ export function GallerySection({ site }: { site: Site }) {
         {savedAt && <span className={styles.sectionSavedAt}>Mentve {savedAt}</span>}
       </div>
       <p className={styles.sectionIntro}>
-        Öt polaroid stílusú fotó a nyitóoldalon. A sorrend balról jobbra felel meg a lent látható helyeknek (1–5). Húzd át a csempéket az átrendezéshez. A kép legalább 1200 px széles legyen, max 25 MB.
+        Egy–öt polaroid stílusú fotó a nyitóoldalon. A sorrend balról jobbra felel meg a lent látható helyeknek. Húzd át a csempéket az átrendezéshez, cseréld vagy töröld őket egyenként. A kép legalább 1200 px széles legyen, max 25 MB.
       </p>
 
       <div {...getRootProps()} className={`${styles.dropzone}${isDragActive ? ` ${styles.dropzoneActive}` : ""}`}>
         <input {...getInputProps()} />
         {isDragActive
           ? <span>Engedd el a képet…</span>
-          : <span>Húzd ide a képeket, vagy <strong>kattints a kiválasztáshoz</strong>. JPG / PNG / HEIC, max 25 MB.</span>}
+          : tiles.length >= MAX_TILES
+            ? <span>Öt kép van fent (maximum). Húzz ide egy újat, és megkérdezem, <strong>melyiket cseréljem le</strong>.</span>
+            : <span>Húzd ide a képeket, vagy <strong>kattints a kiválasztáshoz</strong>. JPG / PNG / HEIC, max 25 MB.</span>}
       </div>
+
+      {targeting && (
+        <div className={styles.targetingBanner}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={pendingQueue[0].previewUrl} alt="" className={styles.targetingThumb} />
+          <span className={styles.targetingText}>
+            Hová kerüljön ez a kép? Kattints egy hely <strong>„Ide”</strong> gombjára.
+            {pendingQueue.length > 1 && ` (még ${pendingQueue.length - 1} vár)`}
+          </span>
+          <button type="button" className={styles.targetingCancel} onClick={cancelTargeting}>
+            Mégse
+          </button>
+        </div>
+      )}
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <SortableContext items={tiles.map((t) => t.uid)} strategy={horizontalListSortingStrategy}>
           <div className={styles.tileRow}>
             {tiles.map((t) => (
-              <SortableTile key={t.uid} tile={t} onChange={(patch) => updateTile(t.uid, patch)} />
+              <SortableTile
+                key={t.uid}
+                tile={t}
+                canRemove={canRemove}
+                targeting={targeting}
+                onChange={(patch) => updateTile(t.uid, patch)}
+                onReplace={(file) => replaceTileFile(t.uid, file)}
+                onRemove={() => removeTile(t.uid)}
+                onPlace={() => placePending(t.uid)}
+              />
             ))}
           </div>
         </SortableContext>

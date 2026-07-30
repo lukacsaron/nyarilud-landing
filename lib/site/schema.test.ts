@@ -15,8 +15,26 @@ describe("SiteSchema", () => {
     expect(SiteSchema.safeParse(bad).success).toBe(false);
   });
 
-  it("rejects a gallery with fewer than 5 photos", () => {
-    const bad = { ...DEFAULT_SITE, gallery: DEFAULT_SITE.gallery.slice(0, 4) };
+  it("accepts a gallery with 1 photo", () => {
+    const ok = { ...DEFAULT_SITE, gallery: DEFAULT_SITE.gallery.slice(0, 1) };
+    expect(SiteSchema.safeParse(ok).success).toBe(true);
+  });
+
+  it("accepts a gallery with 4 photos", () => {
+    const ok = { ...DEFAULT_SITE, gallery: DEFAULT_SITE.gallery.slice(0, 4) };
+    expect(SiteSchema.safeParse(ok).success).toBe(true);
+  });
+
+  it("rejects an empty gallery", () => {
+    const bad = { ...DEFAULT_SITE, gallery: [] };
+    expect(SiteSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it("rejects a gallery with more than 5 photos", () => {
+    const bad = {
+      ...DEFAULT_SITE,
+      gallery: [...DEFAULT_SITE.gallery, { ...DEFAULT_SITE.gallery[0] }],
+    };
     expect(SiteSchema.safeParse(bad).success).toBe(false);
   });
 
