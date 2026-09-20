@@ -55,3 +55,7 @@ export async function saveHoursAction(input: Site["hours"]): Promise<SaveResult>
 export async function saveExceptionsAction(input: Site["exceptions"]): Promise<SaveResult> {
   return saveMutation((current) => ({ ...current, exceptions: input }));
 }
+
+export async function savePressAction(input: Site["press"]): Promise<SaveResult> {
+  return saveMutation((current) => ({ ...current, press: input }));
+}

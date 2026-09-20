@@ -565,3 +565,44 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* Press ----------------------------------------------------------- */
+.pressCard {
+  display: grid;
+  gap: 0.25rem;
+  padding: 1rem;
+  background: #fafafa;
+  border: 1px solid #ececec;
+  border-radius: 8px;
+}
+
+.pressCardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.pressCardTitle {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #2c2c2c;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pressGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1rem;
+}
+
+@media (max-width: 600px) {
+  .pressGrid {
+    grid-template-columns: 1fr;
+  }
+}
