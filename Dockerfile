@@ -1,8 +1,15 @@
 # syntax=docker/dockerfile:1.7
 
 FROM node:22-alpine AS base
-RUN corepack enable
 WORKDIR /app
+# `corepack enable` only installs shims — the package manager itself is fetched
+# lazily on first use, and corepack's bootstrap fetch has no retry (10s connect
+# timeout). Every stage branching off base has its own cache layer, so pnpm was
+# downloaded once per stage and a single network blip in the second one failed
+# the whole build. Materialising it here means deps and builder inherit it.
+# `corepack install` takes the version from package.json's packageManager field.
+COPY package.json ./
+RUN corepack enable && corepack install
 
 FROM base AS deps
 COPY package.json pnpm-lock.yaml ./
