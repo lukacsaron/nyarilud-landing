@@ -81,3 +81,63 @@ describe("SiteSchema", () => {
     expect(SiteSchema.safeParse(good).success).toBe(true);
   });
 });
+
+describe("SiteSchema — press", () => {
+  const validItem = {
+    id: "wlb-2026-09",
+    outlet: "We Love Budapest",
+    title: "Igazi kincsesbánya nyílt Újlipótvárosban",
+    quote: "A Nyári Lúd nem egy tipikus turkáló.",
+    url: "https://welovebudapest.com/cikk/2026/09/16/nyari-lud/",
+    date: "2026-09-16",
+    author: "Gedeon Lili",
+    logo: "welovebudapest.png",
+  };
+
+  it("defaults press to [] when the key is absent (live site.json back-compat)", () => {
+    const { press: _omitted, ...withoutPress } = DEFAULT_SITE;
+    const result = SiteSchema.safeParse(withoutPress);
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.press).toEqual([]);
+  });
+
+  it("accepts a fully populated press item", () => {
+    expect(SiteSchema.safeParse({ ...DEFAULT_SITE, press: [validItem] }).success).toBe(true);
+  });
+
+  it("accepts a press item without the optional fields", () => {
+    const minimal = {
+      id: validItem.id,
+      outlet: validItem.outlet,
+      title: validItem.title,
+      url: validItem.url,
+      date: validItem.date,
+    };
+    expect(SiteSchema.safeParse({ ...DEFAULT_SITE, press: [minimal] }).success).toBe(true);
+  });
+
+  it("rejects a press item with a non-url link", () => {
+    const bad = { ...DEFAULT_SITE, press: [{ ...validItem, url: "welovebudapest.com" }] };
+    expect(SiteSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it("rejects a press item with a malformed date", () => {
+    const bad = { ...DEFAULT_SITE, press: [{ ...validItem, date: "2026.09.16" }] };
+    expect(SiteSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it("rejects a press item with an empty outlet or title", () => {
+    expect(SiteSchema.safeParse({ ...DEFAULT_SITE, press: [{ ...validItem, outlet: "" }] }).success).toBe(false);
+    expect(SiteSchema.safeParse({ ...DEFAULT_SITE, press: [{ ...validItem, title: "" }] }).success).toBe(false);
+  });
+
+  it("rejects more than 8 press items", () => {
+    const many = Array.from({ length: 9 }, (_, i) => ({ ...validItem, id: `p-${i}` }));
+    expect(SiteSchema.safeParse({ ...DEFAULT_SITE, press: many }).success).toBe(false);
+  });
+
+  it("rejects duplicate press ids", () => {
+    const dup = { ...DEFAULT_SITE, press: [validItem, { ...validItem, title: "Másik cím" }] };
+    expect(SiteSchema.safeParse(dup).success).toBe(false);
+  });
+});

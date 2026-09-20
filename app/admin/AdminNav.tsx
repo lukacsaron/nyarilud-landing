@@ -3,6 +3,7 @@ import styles from "./admin.module.css";
 const ITEMS = [
   { href: "#oldal", label: "Oldal alapok" },
   { href: "#galeria", label: "Galéria" },
+  { href: "#sajto", label: "Sajtó" },
   { href: "#nyitva", label: "Nyitvatartás" },
   { href: "#unnepek", label: "Ünnepek" },
 ];

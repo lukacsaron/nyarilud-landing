@@ -35,6 +35,17 @@ const PhotoSchema = z.object({
   blurDataURL: z.string(),
 });
 
+const PressSchema = z.object({
+  id: z.string().min(1),
+  outlet: z.string().min(1),
+  title: z.string().min(1),
+  quote: z.string().optional(),
+  url: z.url(),                                 // ← zod v4: top-level z.url()
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  author: z.string().optional(),
+  logo: z.string().optional(),                  // filename under public/press/, see lib/press.ts
+});
+
 export const SiteSchema = z.object({
   meta: z.object({
     title: z.string().min(1),
@@ -59,12 +70,23 @@ export const SiteSchema = z.object({
     (arr) => new Set(arr.map((p) => p.slot)).size === arr.length,
     { message: "gallery slots must be unique" }
   ),
+  // Optional with a default so a site.json written before press existed still
+  // validates — a parse failure silently falls back to DEFAULT_SITE and would
+  // wipe the live hours, address and gallery.
+  press: z
+    .array(PressSchema)
+    .max(8)
+    .refine((arr) => new Set(arr.map((p) => p.id)).size === arr.length, {
+      message: "press ids must be unique",
+    })
+    .default([]),
 });
 
 export type Site = z.infer<typeof SiteSchema>;
 export type SiteHours = Site["hours"];
 export type SiteException = Site["exceptions"][number];
 export type SitePhoto = Site["gallery"][number];
+export type SitePress = Site["press"][number];
 export type DayKey = keyof SiteHours;
 
 export const DAY_KEYS: readonly DayKey[] = [
@@ -108,5 +130,17 @@ export const DEFAULT_SITE: Site = {
     { id: "seed-3", slot: 3, alt: "Nyári lúd — sárga öv hangtag-gel", pin: "pin", blueTape: false, width: 1440, height: 1920, blurDataURL: "data:image/webp;base64,UklGRgAA" },
     { id: "seed-4", slot: 4, alt: "Nyári lúd — boltbelső", pin: "tape-tr", blueTape: false, width: 1440, height: 1920, blurDataURL: "data:image/webp;base64,UklGRgAA" },
     { id: "seed-5", slot: 5, alt: "Nyári lúd — a kirakat", pin: "tape-top", blueTape: true, tapeRot: "2deg", width: 1440, height: 1920, blurDataURL: "data:image/webp;base64,UklGRgAA" },
+  ],
+  press: [
+    {
+      id: "welovebudapest-2026-09-16",
+      outlet: "We Love Budapest",
+      title: "Igazi kincsesbánya nyílt Újlipótvárosban: skandináv pre-loved ruhadarabok várnak a Nyári Lúdban",
+      quote: "A Nyári Lúd nem egy tipikus turkáló: prémiumbrandek egyesével válogatott darabjait találjuk itt.",
+      url: "https://welovebudapest.com/cikk/2026/09/16/nyari-lud-premium-second-hand-pre-loved-ruhabolt-budapest/",
+      date: "2026-09-16",
+      author: "Gedeon Lili",
+      logo: "welovebudapest.png",
+    },
   ],
 };

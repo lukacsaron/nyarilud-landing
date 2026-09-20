@@ -1,12 +1,43 @@
 import type { Site } from "./schema";
 import { toOpeningHoursSpecification } from "./hours";
 
+type NewsArticleLd = {
+  "@type": "NewsArticle";
+  headline: string;
+  url: string;
+  datePublished: string;
+  publisher: { "@type": "Organization"; name: string };
+  about: { "@id": string };
+  author?: { "@type": "Person"; name: string };
+};
+
+/**
+ * Press coverage *about* the store — schema.org's subjectOf inverse of `about`.
+ *
+ * `?? []` is load-bearing: unstable_cache persists the parsed Site to disk, so a
+ * cache entry written before `press` existed comes back unparsed and the zod
+ * default never runs. This renders in the root layout — a throw here is a
+ * site-wide 500, not a missing section.
+ */
+function toSubjectOf(site: Site, siteUrl: string): NewsArticleLd[] {
+  return (site.press ?? []).map((item) => ({
+    "@type": "NewsArticle" as const,
+    headline: item.title,
+    url: item.url,
+    datePublished: item.date,
+    publisher: { "@type": "Organization" as const, name: item.outlet },
+    about: { "@id": `${siteUrl}/#store` },
+    ...(item.author ? { author: { "@type": "Person" as const, name: item.author } } : {}),
+  }));
+}
+
 export function buildStoreJsonLd(
   site: Site,
   brands: readonly string[],
   siteUrl: string,
   ogImage: string
 ) {
+  const subjectOf = toSubjectOf(site, siteUrl);
   return {
     "@context": "https://schema.org",
     "@type": ["ClothingStore", "SecondHandStore"],
@@ -58,6 +89,7 @@ export function buildStoreJsonLd(
       itemCondition: "https://schema.org/UsedCondition",
     })),
     sameAs: ["https://www.instagram.com/nyarilud/"],
+    ...(subjectOf.length > 0 ? { subjectOf } : {}),
   };
 }
 
